@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/loginSelectionFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
+        android:id="@+id/google_button"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_google" />
+
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
+        android:id="@+id/twitter_button"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_twitter" />
+
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+        android:id="@+id/facebook_button"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_facebook" />
+
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/FirebaseUI.Button.AccountChooser.GitHubButton"
+        android:id="@+id/github_button"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_github" />
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/phone_button"
+        style="@style/FirebaseUI.Button.AccountChooser.PhoneButton"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_phone"
+        tools:ignore="UnusedIds" />
+
+    <com.firebase.ui.auth.util.ui.SupportVectorDrawablesButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/email_button"
+        style="@style/FirebaseUI.Button.AccountChooser.EmailButton"
+        android:layout_width="wrap_content"
+        android:text="@string/fui_sign_in_with_email"
+        tools:ignore="UnusedIds" />
+
+
+
+</LinearLayout>

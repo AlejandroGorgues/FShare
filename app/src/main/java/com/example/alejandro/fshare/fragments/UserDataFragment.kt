@@ -1,4 +1,4 @@
-package com.example.alejandro.fshare.Fragments
+package com.example.alejandro.fshare.fragments
 
 
 import android.os.Bundle
@@ -18,12 +18,12 @@ private const val ARG_PARAM2 = "param2"
  * A simple [Fragment] subclass.
  *
  */
-class SignUpFragment : Fragment() {
+class UserDataFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_up, container, false)
+        return inflater.inflate(R.layout.fragment_user_data, container, false)
     }
 
 
