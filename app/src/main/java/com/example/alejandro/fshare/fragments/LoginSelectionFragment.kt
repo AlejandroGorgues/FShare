@@ -48,7 +48,7 @@ class LoginSelectionFragment : Fragment() {
         }
 
         phoneButton!!.setOnClickListener {
-            showPhoneFragment()
+            showEmailFragment()
         }
 
         emailButton!!.setOnClickListener {
@@ -63,12 +63,6 @@ class LoginSelectionFragment : Fragment() {
 
     private fun showEmailFragment() {
         val fr = SignInEmailFragment()
-        val fc = activity as ChangeListener?
-        fc!!.replaceFragment(fr)
-    }
-
-    private fun showPhoneFragment() {
-        val fr = SignInPhoneFragment()
         val fc = activity as ChangeListener?
         fc!!.replaceFragment(fr)
     }

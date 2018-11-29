@@ -14,11 +14,12 @@ import android.support.design.widget.TextInputEditText
 import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.util.Patterns
 import android.widget.Button
+import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.UserActivity
-import com.example.alejandro.fshare.model.Code
 import com.example.alejandro.fshare.model.User
 import com.google.firebase.database.*
 import java.util.regex.Pattern
@@ -50,7 +51,7 @@ class SignInEmailFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_sign_in_email, container, false)
 
         database = FirebaseDatabase.getInstance()
-        referenceUser = database!!.getReference("user")
+
 
         signInButton = view.findViewById(R.id.button_SignInUser)
         signUpButton = view.findViewById(R.id.button_createUser)
@@ -204,19 +205,32 @@ class SignInEmailFragment : Fragment() {
 
                 signIn(pass, correo)
             }else{
-                checkUser(pass, correo)
+
+                referenceUser = database!!.reference.child("user")
+                checkUser(correo)
+
+                signUp(pass, correo)
             }
         }
 
     }
 
     private fun signUp(pass: String, correo: String) {
-        mAuth!!.createUserWithEmailAndPassword(correo, pass).addOnCompleteListener { task: Task<AuthResult> ->
+
+        mAuth!!.createUserWithEmailAndPassword(correo, pass).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 //Registration OK
-                val fr = UserActivity()
-                val fc = activity as ChangeListener?
-                fc!!.replaceActivity(fr)
+
+
+                if(pass == "administrator" && correo == "administrator@gmail.com") {
+                    val fr = AdministratorActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                }else{
+                    val fr = UserActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                }
             } else {
                 //Registration error
             }
@@ -227,9 +241,17 @@ class SignInEmailFragment : Fragment() {
         mAuth!!.signInWithEmailAndPassword(correo, pass).addOnCompleteListener { task: Task<AuthResult> ->
             if (task.isSuccessful) {
                 //Registration OK
-                val fr = UserActivity()
-                val fc = activity as ChangeListener?
-                fc!!.replaceActivity(fr)
+
+                if(pass == "administrator" && correo == "administrator@gmail.com") {
+                    val fr = AdministratorActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                }else{
+                    val fr = UserActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                }
+
             } else {
                 //Registration error
             }
@@ -238,24 +260,22 @@ class SignInEmailFragment : Fragment() {
 
     }
 
-    private fun checkUser(pass: String, correo: String){
-        var repetido = false
+    private fun checkUser(correo: String){
+        var existe = false
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (ds in dataSnapshot.children) {
-                    if(ds.child("correo").getValue(String::class.java) == correo){
-                        repetido = true
-                        break
+                    if(dataSnapshot.exists()) {
+                        existe = true
                     }
-
-                }
-                if(!repetido) {
-                    database!!.reference.setValue("users")
-                    val key = database!!.getReference("users").push().key
-                    val codigo = Code("correo", pass, "")
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), emailLayout!!.editText!!.text.toString(), codigo)
-                    database!!.getReference("users").child(key!!).setValue(usuario)
-                    signUp(pass, correo)
+                if(!existe) {
+                    database!!.reference.setValue("user")
+                    val key = database!!.reference.child("user").push().key
+                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo)
+                    database!!.getReference("user").child(key!!).setValue(usuario)
+                }else{
+                    val key = database!!.reference.child("user").push().key
+                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo)
+                    database!!.reference.child("user").child(key!!).setValue(usuario)
                 }
 
             }

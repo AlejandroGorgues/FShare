@@ -21,7 +21,8 @@
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/email"
-                    style="@style/FirebaseUI.TextInputEditText.EmailField" />
+                    style="@style/FirebaseUI.TextInputEditText.EmailField"
+                    android:text="administrator@gmail.com"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -36,7 +37,8 @@
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password"
-                    style="@style/FirebaseUI.TextInputEditText.PasswordField" />
+                    style="@style/FirebaseUI.TextInputEditText.PasswordField"
+                    android:text="administrator"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -53,7 +55,8 @@
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/name"
-            style="@style/FirebaseUI.TextInputEditText.NameField" />
+            style="@style/FirebaseUI.TextInputEditText.NameField"
+            android:text="administrator"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -70,7 +73,8 @@
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/phone"
-            style="@style/FirebaseUI.TextInputEditText.PhoneField" />
+            style="@style/FirebaseUI.TextInputEditText.PhoneField"
+            android:text="1231321"/>
 
     </android.support.design.widget.TextInputLayout>
 

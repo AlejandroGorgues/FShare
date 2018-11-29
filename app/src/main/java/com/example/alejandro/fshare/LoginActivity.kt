@@ -13,6 +13,7 @@ import android.content.Intent
 
 class LoginActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBackStackChangedListener {
 
+
     private var manager: FragmentManager? = null
 
 
@@ -46,6 +47,6 @@ class LoginActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBac
     }
 
     override fun onBackStackChanged() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 }

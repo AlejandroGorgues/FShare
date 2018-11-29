@@ -88,7 +88,18 @@
     <string name="acceso">Acceder</string>
     <string name="registro">Registrase</string>
     <string name="resendCode">Volver a enviar el SMS</string>
+    <string name="eliminarUsuario">Eliminar usuario</string>
+    <string name="modificarUsuario">Modificar datos</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
+
+    <string name="hint_nombre">Nombre</string>
+    <string name="hint_telefono">Teléfono</string>
+    <string name="hint_correo">Correo</string>
+    <string name="hint_direccion">Direccion</string>
+    <string name="hint_movil">Movil</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="accion_aceptar">Aceptar</string>
+    <string name="puntosVerticales">&#8942;</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
