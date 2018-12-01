@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.example.alejandro.fshare.fragments.UserListFragment
 
-class AdministratorActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBackStackChangedListener {
+class AdministratorActivity : AppCompatActivity(), ChangeListener {
 
 
     private var manager: FragmentManager? = null
@@ -23,9 +23,8 @@ class AdministratorActivity : AppCompatActivity(), ChangeListener, FragmentManag
         val fragmentLista = UserListFragment()
 
         transaction.add(R.id.administratorFrameLayout, fragmentLista,  "fragmentUserList")
-        transaction.addToBackStack("fragmentUserList")
+        transaction.addToBackStack(null)
         transaction.commit()
-        manager!!.addOnBackStackChangedListener(this)
     }
 
     override fun replaceFragment(fragment: Fragment) {
@@ -41,7 +40,4 @@ class AdministratorActivity : AppCompatActivity(), ChangeListener, FragmentManag
         startActivity(intent)
     }
 
-    override fun onBackStackChanged() {
-
-    }
 }

@@ -6,9 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import com.example.alejandro.fshare.fragments.AlbumFragment
 import com.google.firebase.auth.FirebaseUser
 
-class UserActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBackStackChangedListener {
+class UserActivity : AppCompatActivity(), ChangeListener {
 
 
     private var manager: FragmentManager? = null
@@ -18,13 +19,19 @@ class UserActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBack
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         manager = supportFragmentManager
-        manager!!.addOnBackStackChangedListener(this)
+        val transaction = manager!!.beginTransaction()
+
+        val fragmentLista = AlbumFragment()
+
+        transaction.add(R.id.userFrameLayout, fragmentLista,  "fragmentUserList")
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     override fun replaceFragment(fragment: Fragment) {
         val fragmentManager = manager
         val fragmentTransaction = fragmentManager!!.beginTransaction()
-        fragmentTransaction.replace(R.id.loginFrameLayout, fragment, fragment.toString())
+        fragmentTransaction.replace(R.id.userFrameLayout, fragment, fragment.toString())
         fragmentTransaction.addToBackStack(fragment.toString())
         fragmentTransaction.commit()
     }
@@ -32,9 +39,5 @@ class UserActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBack
     override fun replaceActivity(activity: Activity) {
         val intent = Intent(this, activity::class.java)
         startActivity(intent)
-    }
-
-    override fun onBackStackChanged() {
-
     }
 }

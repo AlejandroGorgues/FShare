@@ -87,9 +87,16 @@
 
     <string name="acceso">Acceder</string>
     <string name="registro">Registrase</string>
-    <string name="resendCode">Volver a enviar el SMS</string>
+
     <string name="eliminarUsuario">Eliminar usuario</string>
     <string name="modificarUsuario">Modificar datos</string>
+    <string name="cambiarCorreo">Cambiar correo</string>
+    <string name="cambiarPassword">Cambiar contraseña</string>
+
+    <string name="cambiarFoto">Cambiar foto</string>
+    <string name="guardarCambios">Guardar</string>
+    <string name="borrarFoto">Borrar foto</string>
+    <string name="cancelar">Cancelar</string>
 
 
 

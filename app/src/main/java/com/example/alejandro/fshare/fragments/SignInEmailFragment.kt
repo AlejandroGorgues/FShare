@@ -269,13 +269,15 @@ class SignInEmailFragment : Fragment() {
                     }
                 if(!existe) {
                     database!!.reference.setValue("user")
-                    val key = database!!.reference.child("user").push().key
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo)
-                    database!!.getReference("user").child(key!!).setValue(usuario)
+                    //val key = database!!.reference.child("user").push().key
+                    val correoEncoded = encodeString(correo)
+                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
+                    database!!.getReference("user").child(correoEncoded).setValue(usuario)
                 }else{
-                    val key = database!!.reference.child("user").push().key
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo)
-                    database!!.reference.child("user").child(key!!).setValue(usuario)
+                    //val key = database!!.reference.child("user").push().key
+                    val correoEncoded = encodeString(correo)
+                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
+                    database!!.reference.child("user").child(correoEncoded).setValue(usuario)
                 }
 
             }
@@ -283,6 +285,17 @@ class SignInEmailFragment : Fragment() {
             override fun onCancelled(databaseError: DatabaseError) {}
         }
         referenceUser!!.addListenerForSingleValueEvent(valueEventListener)
+    }
+
+
+    fun encodeString(string: String): String {
+        val stringAux = string.replace("@", "?")
+        return stringAux.replace(".", ",")
+    }
+
+    fun decodeString(string: String): String {
+        val stringAux = string.replace("?", "@")
+        return stringAux.replace(",", ".")
     }
 }
 

@@ -11,7 +11,7 @@ import android.content.Intent
 
 
 
-class LoginActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBackStackChangedListener {
+class LoginActivity : AppCompatActivity(), ChangeListener {
 
 
     private var manager: FragmentManager? = null
@@ -27,9 +27,8 @@ class LoginActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBac
         val fragmentLista = LoginSelectionFragment()
 
         transaction.add(R.id.loginFrameLayout, fragmentLista,  "fragmentLogin")
-        transaction.addToBackStack("fragmentLogin")
+        transaction.addToBackStack(null)
         transaction.commit()
-        manager!!.addOnBackStackChangedListener(this)
 
     }
 
@@ -44,9 +43,5 @@ class LoginActivity : AppCompatActivity(), ChangeListener, FragmentManager.OnBac
     override fun replaceActivity(activity: Activity) {
         val intent = Intent(this, activity::class.java)
         startActivity(intent)
-    }
-
-    override fun onBackStackChanged() {
-
     }
 }

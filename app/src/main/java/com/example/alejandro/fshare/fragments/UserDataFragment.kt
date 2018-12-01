@@ -1,20 +1,19 @@
 package com.example.alejandro.fshare.fragments
 
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.design.widget.TextInputLayout
 import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.util.Patterns
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
-import com.example.alejandro.fshare.ChangeListener
-import com.example.alejandro.fshare.LoginActivity
+import com.example.alejandro.fshare.*
 import com.example.alejandro.fshare.R
 import com.example.alejandro.fshare.model.User
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +21,9 @@ import com.google.firebase.database.*
 import java.util.*
 import java.util.regex.Pattern
 import com.google.firebase.auth.EmailAuthProvider
+
+
+
 
 
 
@@ -36,6 +38,8 @@ class UserDataFragment : Fragment() {
 
     private var deleteUserButton: Button? = null
     private var modUserButton: Button? = null
+    private var changePasswordButton: Button? = null
+    private var changeEmailButton: Button? = null
 
 
     private var emailLayout: TextInputLayout? = null
@@ -56,16 +60,21 @@ class UserDataFragment : Fragment() {
 
     private var referenceUserDelete: DatabaseReference? = null
     private var referenceUserModify: DatabaseReference? = null
+    private var referenceUserProfile: DatabaseReference? =  null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_user_data, container, false)
+
+        setHasOptionsMenu(true)
 
         database = FirebaseDatabase.getInstance()
 
 
         deleteUserButton = view.findViewById(R.id.button_deleteUser)
         modUserButton = view.findViewById(R.id.button_modifiedUser)
+        changePasswordButton = view.findViewById(R.id.button_modifiedPassword)
+        changeEmailButton = view.findViewById(R.id.button_modifiedEmail)
 
 
         emailLayout = view.findViewById(R.id.emailUser_layout)
@@ -95,16 +104,34 @@ class UserDataFragment : Fragment() {
         emailText!!.setText(correo)
 
         deleteUserButton!!.setOnClickListener {
-            referenceUserDelete = database!!.reference.child("user").child(mAuth!!.currentUser!!.email!!)
-            borrarUsuario(mAuth!!.currentUser!!.email!!, passwordText!!.text.toString())
+            referenceUserDelete = database!!.reference.child("user")
+            borrarUsuario()
         }
 
         modUserButton!!.setOnClickListener {
-            validarDatos()
+            validarDatos(1)
+        }
+
+        changeEmailButton!!.setOnClickListener {
+            validarDatos(2)
+        }
+
+
+
+        changePasswordButton!!.setOnClickListener {
+            validarDatos(3)
+
         }
 
         if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
             deleteUserButton!!.visibility = View.GONE
+            changeEmailButton!!.visibility = View.GONE
+            changePasswordButton!!.visibility = View.GONE
+            val toolbar = view.findViewById<Toolbar>(R.id.profileToolbar)
+            (activity as AdministratorActivity).setSupportActionBar(toolbar)
+        }else{
+            val toolbar = view.findViewById<Toolbar>(R.id.profileToolbar)
+            (activity as UserActivity).setSupportActionBar(toolbar)
         }
 
         nameText!!.addTextChangedListener(
@@ -181,6 +208,48 @@ class UserDataFragment : Fragment() {
         return view
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            activity!!.menuInflater.inflate(R.menu.admin_options_menu, menu)
+        }else{
+            activity!!.menuInflater.inflate(R.menu.user_options_menu, menu)
+        }
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            return when (item.itemId) {
+                R.id.action_out -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+
+                else -> super.onOptionsItemSelected(item)
+            }
+        }else{
+            return when (item.itemId) {
+                R.id.action_out-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                R.id.action_show-> {
+
+                    referenceUserProfile = database!!.reference.child("user")
+                    accederPerfil()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
     private fun esCorreoValido(correo: String): Boolean {
         if (!Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
             emailLayout!!.error = "Correo electrónico inválido"
@@ -215,7 +284,7 @@ class UserDataFragment : Fragment() {
         return true
     }
 
-    private fun validarDatos() {
+    private fun validarDatos(tipo: Int) {
         val pass = passwordLayout!!.editText!!.text.toString()
         val correo = emailLayout!!.editText!!.text.toString()
         val name = nameLayout!!.editText!!.text.toString()
@@ -225,34 +294,53 @@ class UserDataFragment : Fragment() {
         val e = esCorreoValido(correo)
 
         if (a && b && e) {
-            referenceUserModify = database!!.reference.child("user").child(mAuth!!.currentUser!!.email!!)
-            modificarUsuario(correo, name, phone, pass)
+            when (tipo) {
+                1 -> //referenceUserModify = database!!.reference.child("user")
+                    modificarUsuario(correo, name, phone, pass)
+                2 -> {
+                    referenceUserModify = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!))
+                    changeEmail(correo)
+                }
+                else -> {
+
+                    changePass(pass)
+                }
+            }
+
 
         }
 
     }
 
-    private fun borrarUsuario(email:String, pass: String){
-        val user = FirebaseAuth.getInstance().currentUser
+    private fun borrarUsuario(){
+        val user = mAuth!!.currentUser
+        var usuario: User
 
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val key = dataSnapshot.key
-                database!!.reference.child("user").child(key!!).removeValue()
-                val credential = EmailAuthProvider
-                        .getCredential(email, pass)
-                user!!.reauthenticate(credential)
-                        .addOnCompleteListener {
-                            user.delete()
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            val fr = LoginActivity()
-                                            val fc = activity as ChangeListener?
-                                            fc!!.replaceActivity(fr)
-                                            Log.e("aqui", "User account deleted.")
-                                        }
-                                    }
-                        }
+                for( ds: DataSnapshot in dataSnapshot.children){
+                    usuario = ds.getValue(User::class.java)!!
+                    if(usuario.correo == correo) {
+                        val key = dataSnapshot.key
+                        val password = usuario.password
+                        database!!.reference.child("user").child(key!!).removeValue()
+                        val credential = EmailAuthProvider
+                                .getCredential(usuario.correo, password)
+                        user!!.reauthenticate(credential)
+                                .addOnCompleteListener {
+                                    user.delete()
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    val fr = LoginActivity()
+                                                    val fc = activity as ChangeListener?
+                                                    fc!!.replaceActivity(fr)
+                                                    Log.e("aqui", "User account deleted.")
+                                                }
+                                            }
+                                }
+                    }
+                }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
@@ -261,24 +349,114 @@ class UserDataFragment : Fragment() {
         referenceUserDelete!!.addListenerForSingleValueEvent(valueEventListener)
     }
 
-    private fun modificarUsuario(correo: String, name: String, phone: String, pass: String){
+    private fun modificarUsuario(correoN: String, nameN: String, phoneN: String, passN: String){
         val childUpdatesUser = HashMap<String,User>()
-        val usuarioMod = User(name, phone,correo)
+        val usuarioMod = User(nameN, phoneN,correoN, passN)
+
+        childUpdatesUser["/user/${encodeString(correoN)}"] = usuarioMod
+        database!!.reference.updateChildren(childUpdatesUser as Map<String, Any>)
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
+            val fr = UserListFragment()
+            val fc = activity as ChangeListener?
+            fc!!.replaceFragment(fr)
+        }else{
+            val fr = AlbumFragment()
+            val fc = activity as ChangeListener?
+            fc!!.replaceFragment(fr)
+        }
+    }
+
+    private fun changeEmail(email: String){
+        val user = mAuth!!.currentUser
+        val finalPath =  database!!.reference.child("user").child(encodeString(email))
 
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val key = dataSnapshot.key
-                childUpdatesUser["/user/$key"] = usuarioMod
-                database!!.reference.updateChildren(childUpdatesUser as Map<String, Any>)
-                val fr = UserListFragment()
-                val fc = activity as ChangeListener?
-                fc!!.replaceFragment(fr)
+
+                user!!.updateEmail(email)
+                    .addOnCompleteListener { taskUpdate ->
+                        if (taskUpdate.isSuccessful) {
+                            finalPath.setValue(dataSnapshot.value).addOnCompleteListener { task ->
+                                if (task.isComplete) {
+                                    Log.d(TAG, "Success!")
+                                    referenceUserModify!!.removeValue()
+                                    finalPath.child("correo").setValue(encodeString(email).toLowerCase())
+                                    Log.d(TAG, "User email address updated.")
+                                    val fr = AlbumFragment()
+                                    val fc = activity as ChangeListener?
+                                    fc!!.replaceFragment(fr)
+                                } else {
+                                    Log.d(TAG, "Copy failed!")
+                                }
+                        }
+                    }
+                }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
         }
 
         referenceUserModify!!.addListenerForSingleValueEvent(valueEventListener)
+
+    }
+
+    private fun changePass(password: String){
+        val user = mAuth!!.currentUser
+
+        user!!.updatePassword(password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        database!!.reference.child("user").child(encodeString(user.email!!)).child("password").setValue(password)
+                        val fr = AlbumFragment()
+                        val fc = activity as ChangeListener?
+                        fc!!.replaceFragment(fr)
+                        Log.d(TAG, "User password updated.")
+                    }
+                }
+    }
+
+    private fun accederPerfil(){
+        val bundle = Bundle()
+
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for( ds: DataSnapshot in dataSnapshot.children){
+                    val usuario = ds.getValue(User::class.java)
+                    if(usuario!!.correo == encodeString(mAuth!!.currentUser!!.email!!)){
+
+                        bundle.putString("Nombre", usuario.nombre)
+                        bundle.putString("Password", usuario.password)
+                        bundle.putString("Telefono", usuario.telefono)
+                        bundle.putString("Correo", decodeString(usuario.correo))
+
+                        val fr = UserDataFragment()
+                        fr.arguments = bundle
+                        val fc = activity as ChangeListener?
+                        fc!!.replaceFragment(fr)
+                        break
+                    }
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+
+        referenceUserProfile!!.addListenerForSingleValueEvent(valueEventListener)
+    }
+
+
+
+    fun encodeString(string: String): String {
+        val stringAux = string.replace("@", "?")
+        return stringAux.replace(".", ",")
+    }
+
+    fun decodeString(string: String): String {
+        val stringAux = string.replace("?", "@")
+        return stringAux.replace(",", ".")
     }
 
 

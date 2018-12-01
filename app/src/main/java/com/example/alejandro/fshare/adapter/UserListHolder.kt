@@ -19,7 +19,7 @@ class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     var nombreUser: TextView = itemView.findViewById(R.id.uNombre)
     var phoneUser: TextView = itemView.findViewById(R.id.uTelefono)
-    var cardUser: CardView = itemView.findViewById(R.id.cardView)
+    var cardUser: CardView = itemView.findViewById(R.id.cardViewUser)
     var viewAux: View = itemView
 
     fun bindUser(u: User) {
@@ -33,6 +33,6 @@ class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
 }
 
-interface ClickListener {
+interface ClickListenerUser {
     fun elementClicked(id:Int, v: View, user: User)
 }

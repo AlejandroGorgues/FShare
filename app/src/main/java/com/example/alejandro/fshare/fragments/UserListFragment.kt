@@ -14,7 +14,7 @@ import com.example.alejandro.fshare.LoginActivity
 
 import com.example.alejandro.fshare.R
 import com.example.alejandro.fshare.adapter.UserListHolder
-import com.example.alejandro.fshare.adapter.ClickListener
+import com.example.alejandro.fshare.adapter.ClickListenerUser
 import com.example.alejandro.fshare.model.User
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -22,15 +22,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 
-class UserListFragment : Fragment(), ClickListener {
+class UserListFragment : Fragment(), ClickListenerUser {
 
     private var database: FirebaseDatabase? = null
     lateinit var mDatabase: DatabaseReference
-    lateinit var mDatabaseDelete: DatabaseReference
 
-    var mAdapter: FirebaseRecyclerAdapter<User, UserListHolder>? = null
-    var recyclerUserList: RecyclerView? = null
-    var query: Query? = null
+    private var mAdapter: FirebaseRecyclerAdapter<User, UserListHolder>? = null
+    private var recyclerUserList: RecyclerView? = null
+    private var query: Query? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -100,9 +99,9 @@ class UserListFragment : Fragment(), ClickListener {
         val bundle = Bundle()
 
         bundle.putString("Nombre", user.nombre)
-        bundle.putString("Password", "1234")
+        bundle.putString("Password", user.password)
         bundle.putString("Telefono", user.telefono)
-        bundle.putString("Correo", user.correo)
+        bundle.putString("Correo", decodeString(user.correo))
 
        val fr = UserDataFragment()
         fr.arguments = bundle
@@ -128,5 +127,10 @@ class UserListFragment : Fragment(), ClickListener {
         recyclerUserList!!.adapter = mAdapter
         recyclerUserList!!.layoutManager = LinearLayoutManager(activity)
         recyclerUserList!!.itemAnimator = DefaultItemAnimator()
+    }
+
+    private fun decodeString(string: String): String {
+        val stringAux = string.replace("?", "@")
+        return stringAux.replace(",", ".")
     }
 }

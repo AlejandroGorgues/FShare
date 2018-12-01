@@ -86,19 +86,32 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_deleteUser"
             style="@style/FirebaseUI.Button"
-            android:text="@string/eliminarUsuario" />
+            android:text="@string/eliminarUsuario"
+            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/button_modifiedUser"
             style="@style/FirebaseUI.Button"
-            android:text="@string/modificarUsuario"/>
+            android:text="@string/modificarUsuario"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/button_modifiedEmail"
+            style="@style/FirebaseUI.Button"
+            android:text="@string/cambiarCorreo"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/button_modifiedPassword"
+            style="@style/FirebaseUI.Button"
+            android:text="@string/cambiarPassword"
+            android:layout_weight="1"/>
     </LinearLayout>
 
 </LinearLayout>
