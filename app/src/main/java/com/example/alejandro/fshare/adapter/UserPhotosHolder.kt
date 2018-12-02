@@ -14,17 +14,19 @@ class UserPhotosHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     var commentarioFoto: TextView = itemView.findViewById(R.id.fotoComentario)
     private var foto: ImageView = itemView.findViewById(R.id.fotoAux)
-    var cardUser: CardView = itemView.findViewById(R.id.cardViewFoto)
+    var cardUser: CardView = itemView.findViewById<CardView>(R.id.cardViewFoto)
     var viewAux: View = itemView
 
-    fun bindFoto(f: Photo) {
+    fun bindFoto(f: Photo, currentEmail: String) {
 
-        commentarioFoto.text = f.comentario
+        if(f.correo == currentEmail) {
+            commentarioFoto.text = f.comentario
 
-        GlideApp
-                .with(itemView.context)
-                .load("https://i.imgur.com/DvpvklR.png")
-                .into(foto)
+            GlideApp
+                    .with(itemView.context)
+                    .load(f.foto)
+                    .into(foto)
+        }
     }
 
 }

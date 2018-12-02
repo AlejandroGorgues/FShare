@@ -24,10 +24,11 @@ import com.google.firebase.storage.StorageReference
 import android.content.Intent
 import android.text.Editable
 import android.util.Log
-import android.widget.ImageView
 import com.example.alejandro.fshare.*
 import com.example.alejandro.fshare.R
 import com.firebase.ui.database.FirebaseRecyclerOptions
+
+
 
 
 class AlbumFragment : Fragment(), ClickListenerPhoto {
@@ -57,7 +58,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
     private val OPEN_DOCUMENT_CODE = 2
 
     private var query: Query? = null
-    private var path: Uri? = null
+    private var nameImage: Uri? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -72,7 +73,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         database = FirebaseDatabase.getInstance()
         storage = FirebaseStorage.getInstance()
 
-        referenceFotoListDatabase = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos")
+        referenceFotoListDatabase = database!!.reference.child("photos")
         // Inflate the layout for this fragment
         recyclerFotoList = view.findViewById(R.id.rvfotoList)
 
@@ -93,12 +94,11 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             }
 
             override fun onBindViewHolder(holder: UserPhotosHolder, position: Int, foto: Photo) {
-                holder.bindFoto(foto)
+
+                holder.bindFoto(foto, mAuth!!.currentUser!!.email!!)
                 holder.cardUser.setOnClickListener {
                     elementClicked(holder.adapterPosition, holder.viewAux, foto)
                 }
-
-
             }
 
         }
@@ -141,7 +141,8 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         val bundle = Bundle()
 
         bundle.putString("Comentario", foto.comentario)
-        bundle.putString("Foto", "https://i.imgur.com/DvpvklR.png")
+        bundle.putString("Foto", foto.foto)
+        bundle.putString("Uri", foto.uri)
 
         val fr = PhotoDetailFragment()
         fr.arguments = bundle
@@ -167,8 +168,8 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         if (requestCode == OPEN_DOCUMENT_CODE && resultCode == RESULT_OK) {
             if (data != null) {
 
-                path = data.data
-                dirFoto!!.text = Editable.Factory.getInstance().newEditable(path!!.lastPathSegment.toString())
+                nameImage =  data.data
+                dirFoto!!.text = Editable.Factory.getInstance().newEditable(PathClass().getRealPathFromURI(context!!, nameImage!!))
             }
         }
     }
@@ -186,12 +187,13 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for( ds: DataSnapshot in dataSnapshot.children){
                     val usuario = ds.getValue(User::class.java)
-                    if(usuario!!.correo == encodeString(mAuth!!.currentUser!!.email!!)){
+                    if(usuario!!.correo == mAuth!!.currentUser!!.email!!){
+
 
                         bundle.putString("Nombre", usuario.nombre)
                         bundle.putString("Password", usuario.password)
                         bundle.putString("Telefono", usuario.telefono)
-                        bundle.putString("Correo", decodeString(usuario.correo))
+                        bundle.putString("Correo", usuario.correo)
 
                         val fr = UserDataFragment()
                         fr.arguments = bundle
@@ -238,48 +240,40 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             //Referencia mediante el correo electrónico sin codificarlo
             storageReference = storage!!.reference.child(mAuth!!.currentUser!!.email!!)
 
-            //val file = Uri.fromFile(File(path))
-            val fotoRef = storageReference!!.child(path!!.lastPathSegment)
-            val uploadTask = fotoRef.putFile(path!!)
-            val foto = Photo(mAuth!!.currentUser!!.email!!+"/"+path!!.lastPathSegment, comentarioLayout!!.editText!!.text.toString())
 
-            // Register observers to listen for when the download is done or if it fails
-            uploadTask.addOnFailureListener {
-                // Handle unsuccessful uploads
-            }.addOnSuccessListener {
-                referenceFotoDatabase = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos")
-                checkPhoto(foto)
-                show.dismiss()
-            }
+            val fotoRef = storageReference!!.child(nameImage!!.lastPathSegment)
+            val uploadTask = fotoRef.putFile(nameImage!!)
+                uploadTask.addOnFailureListener {
+                    // Handle unsuccessful uploads
+                }.addOnSuccessListener {
+                    storage!!.reference.child(mAuth!!.currentUser!!.email!! + "/" +nameImage!!.lastPathSegment).downloadUrl.addOnSuccessListener {itUrl ->
+                    val  foto = Photo(itUrl.toString() , comentarioLayout!!.editText!!.text.toString(), mAuth!!.currentUser!!.email!! + "/" +nameImage!!.lastPathSegment, mAuth!!.currentUser!!.email!!)
+
+                    referenceFotoDatabase = database!!.reference.child("photos")
+                    checkPhoto(foto)
+                    show.dismiss()
+               }.addOnFailureListener {
+                   // Handle any errors
+               }
+                }
         }
     }
 
     private fun checkPhoto(foto: Photo){
         var existeFoto = false
-        var existeDir = false
-        var fotoAux: Photo
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if(dataSnapshot.exists()){
-                    existeDir = true
-                    for(ds: DataSnapshot in dataSnapshot.children){
-                        fotoAux = ds.getValue(Photo::class.java)!!
-                        if(fotoAux.foto == foto.foto  && fotoAux.comentario == foto.comentario) {
+                    for(ds: DataSnapshot in dataSnapshot.children) {
+                        val fotoAux = ds.getValue(Photo::class.java)!!
+                        if (fotoAux.foto == foto.foto && foto.correo == fotoAux.correo) {
                             existeFoto = true
+
                         }
                     }
-                }
-
-                if(!existeDir){
-                    database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)+"/make").setValue("photos")
-                }
 
                 if(!existeFoto) {
-                    val key = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos").push().key
-                    database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos").child(key!!).setValue(foto)
-                }else{
-                    val key = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos").push().key
-                    database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!)).child("photos").child(key!!).setValue(foto)
+                   val key = database!!.reference.child("photos").push().key
+                    database!!.reference.child("photos").child(key!!).setValue(foto)
                 }
 
             }
@@ -288,17 +282,4 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         }
         referenceFotoDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
-
-
-    fun encodeString(string: String): String {
-        val stringAux = string.replace("@", "?")
-        return stringAux.replace(".", ",")
-    }
-
-    fun decodeString(string: String): String {
-        val stringAux = string.replace("?", "@")
-        return stringAux.replace(",", ".")
-    }
-
-
 }

@@ -15,6 +15,7 @@ import android.view.*
 import android.widget.Button
 import com.example.alejandro.fshare.*
 import com.example.alejandro.fshare.R
+import com.example.alejandro.fshare.model.Photo
 import com.example.alejandro.fshare.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -59,6 +60,8 @@ class UserDataFragment : Fragment() {
     private var correo: String? = null
 
     private var referenceUserDelete: DatabaseReference? = null
+    private var referenceUserChangeEmail: DatabaseReference? = null
+    private var referenceUserChangePassword: DatabaseReference? = null
     private var referenceUserModify: DatabaseReference? = null
     private var referenceUserProfile: DatabaseReference? =  null
 
@@ -295,14 +298,17 @@ class UserDataFragment : Fragment() {
 
         if (a && b && e) {
             when (tipo) {
-                1 -> //referenceUserModify = database!!.reference.child("user")
+                1 -> {
+                    referenceUserModify = database!!.reference.child("user")
                     modificarUsuario(correo, name, phone, pass)
+                }
                 2 -> {
-                    referenceUserModify = database!!.reference.child("user").child(encodeString(mAuth!!.currentUser!!.email!!))
+                    referenceUserChangeEmail = database!!.reference.child("user")
                     changeEmail(correo)
                 }
                 else -> {
 
+                    referenceUserChangePassword = database!!.reference.child("user")
                     changePass(pass)
                 }
             }
@@ -353,67 +359,93 @@ class UserDataFragment : Fragment() {
         val childUpdatesUser = HashMap<String,User>()
         val usuarioMod = User(nameN, phoneN,correoN, passN)
 
-        childUpdatesUser["/user/${encodeString(correoN)}"] = usuarioMod
-        database!!.reference.updateChildren(childUpdatesUser as Map<String, Any>)
-        if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
-            val fr = UserListFragment()
-            val fc = activity as ChangeListener?
-            fc!!.replaceFragment(fr)
-        }else{
-            val fr = AlbumFragment()
-            val fc = activity as ChangeListener?
-            fc!!.replaceFragment(fr)
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for(ds:DataSnapshot in dataSnapshot.children){
+                    val usuario = ds.getValue(User::class.java)
+                    if(usuario!!.correo == mAuth!!.currentUser!!.email){
+                        val key = ds.key
+
+                        childUpdatesUser["/user/$key"] = usuarioMod
+                        database!!.reference.updateChildren(childUpdatesUser as Map<String, Any>)
+                        if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
+                            val fr = UserListFragment()
+                            val fc = activity as ChangeListener?
+                            fc!!.replaceFragment(fr)
+                        }else{
+                            val fr = AlbumFragment()
+                            val fc = activity as ChangeListener?
+                            fc!!.replaceFragment(fr)
+                        }
+                    }
+                }
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
         }
+        referenceUserModify!!.addListenerForSingleValueEvent(valueEventListener)
+
     }
 
     private fun changeEmail(email: String){
         val user = mAuth!!.currentUser
-        val finalPath =  database!!.reference.child("user").child(encodeString(email))
 
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                user!!.updateEmail(email)
-                    .addOnCompleteListener { taskUpdate ->
-                        if (taskUpdate.isSuccessful) {
-                            finalPath.setValue(dataSnapshot.value).addOnCompleteListener { task ->
-                                if (task.isComplete) {
-                                    Log.d(TAG, "Success!")
-                                    referenceUserModify!!.removeValue()
-                                    finalPath.child("correo").setValue(encodeString(email).toLowerCase())
-                                    Log.d(TAG, "User email address updated.")
-                                    val fr = AlbumFragment()
-                                    val fc = activity as ChangeListener?
-                                    fc!!.replaceFragment(fr)
-                                } else {
-                                    Log.d(TAG, "Copy failed!")
+                for(ds:DataSnapshot in dataSnapshot.children){
+                    val usuario = ds.getValue(User::class.java)
+                    if(usuario!!.correo == mAuth!!.currentUser!!.email){
+                        val key = ds.key
+                        user!!.updateEmail(email)
+                            .addOnCompleteListener { taskUpdate ->
+                                if (taskUpdate.isSuccessful) {
+                                    referenceUserChangeEmail!!.child(key!!).child("correo").setValue(email)
                                 }
-                        }
+                            }
                     }
                 }
+
 
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
         }
 
-        referenceUserModify!!.addListenerForSingleValueEvent(valueEventListener)
+        referenceUserChangeEmail!!.addListenerForSingleValueEvent(valueEventListener)
 
     }
 
     private fun changePass(password: String){
         val user = mAuth!!.currentUser
 
-        user!!.updatePassword(password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        database!!.reference.child("user").child(encodeString(user.email!!)).child("password").setValue(password)
-                        val fr = AlbumFragment()
-                        val fc = activity as ChangeListener?
-                        fc!!.replaceFragment(fr)
-                        Log.d(TAG, "User password updated.")
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for(ds:DataSnapshot in dataSnapshot.children){
+                    val usuario = ds.getValue(User::class.java)
+                    if(usuario!!.correo == mAuth!!.currentUser!!.email){
+                        val key = ds.key
+                        user!!.updatePassword(password)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        referenceUserChangePassword!!.child(key!!).child("password").setValue(password)
+                                        val fr = AlbumFragment()
+                                        val fc = activity as ChangeListener?
+                                        fc!!.replaceFragment(fr)
+                                        Log.d(TAG, "User password updated.")
+                                    }
+                                }
                     }
                 }
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+
+        referenceUserChangePassword!!.addListenerForSingleValueEvent(valueEventListener)
     }
 
     private fun accederPerfil(){
@@ -423,12 +455,12 @@ class UserDataFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for( ds: DataSnapshot in dataSnapshot.children){
                     val usuario = ds.getValue(User::class.java)
-                    if(usuario!!.correo == encodeString(mAuth!!.currentUser!!.email!!)){
+                    if(usuario!!.correo == mAuth!!.currentUser!!.email!!){
 
                         bundle.putString("Nombre", usuario.nombre)
                         bundle.putString("Password", usuario.password)
                         bundle.putString("Telefono", usuario.telefono)
-                        bundle.putString("Correo", decodeString(usuario.correo))
+                        bundle.putString("Correo", usuario.correo)
 
                         val fr = UserDataFragment()
                         fr.arguments = bundle
@@ -446,18 +478,5 @@ class UserDataFragment : Fragment() {
 
         referenceUserProfile!!.addListenerForSingleValueEvent(valueEventListener)
     }
-
-
-
-    fun encodeString(string: String): String {
-        val stringAux = string.replace("@", "?")
-        return stringAux.replace(".", ",")
-    }
-
-    fun decodeString(string: String): String {
-        val stringAux = string.replace("?", "@")
-        return stringAux.replace(",", ".")
-    }
-
 
 }

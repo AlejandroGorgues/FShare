@@ -101,7 +101,7 @@ class UserListFragment : Fragment(), ClickListenerUser {
         bundle.putString("Nombre", user.nombre)
         bundle.putString("Password", user.password)
         bundle.putString("Telefono", user.telefono)
-        bundle.putString("Correo", decodeString(user.correo))
+        bundle.putString("Correo", user.correo)
 
        val fr = UserDataFragment()
         fr.arguments = bundle
@@ -127,10 +127,5 @@ class UserListFragment : Fragment(), ClickListenerUser {
         recyclerUserList!!.adapter = mAdapter
         recyclerUserList!!.layoutManager = LinearLayoutManager(activity)
         recyclerUserList!!.itemAnimator = DefaultItemAnimator()
-    }
-
-    private fun decodeString(string: String): String {
-        val stringAux = string.replace("?", "@")
-        return stringAux.replace(",", ".")
     }
 }

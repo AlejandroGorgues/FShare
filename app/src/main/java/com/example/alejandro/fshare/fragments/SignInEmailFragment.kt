@@ -20,6 +20,7 @@ import android.widget.Button
 import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.UserActivity
+import com.example.alejandro.fshare.model.Photo
 import com.example.alejandro.fshare.model.User
 import com.google.firebase.database.*
 import java.util.regex.Pattern
@@ -269,15 +270,15 @@ class SignInEmailFragment : Fragment() {
                     }
                 if(!existe) {
                     database!!.reference.setValue("user")
-                    //val key = database!!.reference.child("user").push().key
-                    val correoEncoded = encodeString(correo)
+
+                    val key = referenceUser!!.push().key
                     val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
-                    database!!.getReference("user").child(correoEncoded).setValue(usuario)
+                    database!!.getReference("user").child(key!!).setValue(usuario)
                 }else{
-                    //val key = database!!.reference.child("user").push().key
-                    val correoEncoded = encodeString(correo)
+
+                    val key = referenceUser!!.push().key
                     val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
-                    database!!.reference.child("user").child(correoEncoded).setValue(usuario)
+                    database!!.reference.child("user").child(key!!).setValue(usuario)
                 }
 
             }
@@ -287,15 +288,5 @@ class SignInEmailFragment : Fragment() {
         referenceUser!!.addListenerForSingleValueEvent(valueEventListener)
     }
 
-
-    fun encodeString(string: String): String {
-        val stringAux = string.replace("@", "?")
-        return stringAux.replace(".", ",")
-    }
-
-    fun decodeString(string: String): String {
-        val stringAux = string.replace("?", "@")
-        return stringAux.replace(",", ".")
-    }
 }
 
