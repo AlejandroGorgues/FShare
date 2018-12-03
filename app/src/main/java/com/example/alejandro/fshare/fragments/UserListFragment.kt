@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
+import android.widget.PopupMenu
 import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.LoginActivity
@@ -96,18 +97,43 @@ class UserListFragment : Fragment(), ClickListenerUser {
     }
 
     override fun elementClicked(id: Int, v: View, user:User) {
-        val bundle = Bundle()
 
-        bundle.putString("Nombre", user.nombre)
-        bundle.putString("Password", user.password)
-        bundle.putString("Telefono", user.telefono)
-        bundle.putString("Correo", user.correo)
 
-       val fr = UserDataFragment()
-        fr.arguments = bundle
+        val popupMenu = PopupMenu(activity, v)
+        popupMenu.inflate(R.menu.user_management_menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when {
+                item.itemId == R.id.verPerfil -> {
+                    val bundle = Bundle()
 
-       val fc = activity as ChangeListener?
-       fc!!.replaceFragment(fr)
+                    bundle.putString("Nombre", user.nombre)
+                    bundle.putString("Password", user.password)
+                    bundle.putString("Telefono", user.telefono)
+                    bundle.putString("Correo", user.correo)
+
+                    val fr = UserDataFragment()
+                    fr.arguments = bundle
+
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
+                else -> {
+                    val bundle = Bundle()
+                    bundle.putBoolean("admin", true)
+                    bundle.putString("correoActual", user.correo)
+
+                    val fr = AlbumFragment()
+                    fr.arguments = bundle
+
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
+            }
+        }
+        popupMenu.show()
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.alejandro.fshare.fragments
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -20,10 +21,7 @@ import android.widget.Button
 import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.UserActivity
-import com.example.alejandro.fshare.model.Photo
-import com.example.alejandro.fshare.model.User
 import com.google.firebase.database.*
-import java.util.regex.Pattern
 
 
 class SignInEmailFragment : Fragment() {
@@ -37,15 +35,9 @@ class SignInEmailFragment : Fragment() {
 
     private var emailLayout: TextInputLayout? = null
     private var passwordLayout: TextInputLayout? = null
-    private var phoneLayout: TextInputLayout? = null
-    private var nameLayout: TextInputLayout? = null
 
     private var emailText: TextInputEditText? = null
     private var passwordText: TextInputEditText? = null
-    private var phoneText: TextInputEditText? = null
-    private var nameText: TextInputEditText? = null
-
-    private var referenceUser: DatabaseReference? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -60,64 +52,23 @@ class SignInEmailFragment : Fragment() {
 
         emailLayout = view.findViewById(R.id.email_layout)
         passwordLayout = view.findViewById(R.id.password_layout)
-        nameLayout = view.findViewById(R.id.name_layout)
-        phoneLayout = view.findViewById(R.id.phone_layout)
 
 
         emailText = view.findViewById(R.id.email)
         passwordText = view.findViewById(R.id.password)
-        nameText = view.findViewById(R.id.name)
-        phoneText = view.findViewById(R.id.phone)
 
         mAuth = FirebaseAuth.getInstance()
 
-
-
         signInButton!!.setOnClickListener {
 
-            validarDatos(0)
+            validarDatos()
         }
 
         signUpButton!!.setOnClickListener {
-            validarDatos(1)
+            val fr = SignUpEmailFragment()
+            val fc = activity as ChangeListener?
+            fc!!.replaceFragment(fr)
         }
-
-
-        nameText!!.addTextChangedListener(
-                object : TextWatcher {
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                    }
-
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        esNombreValido(s.toString())
-                    }
-
-                    override fun afterTextChanged(p0: Editable?) {
-
-                    }
-
-
-                })
-
-        phoneText!!.addTextChangedListener(
-                object : TextWatcher {
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                    }
-
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                        esTelefonoValido(s.toString())
-                    }
-
-                    override fun afterTextChanged(p0: Editable?) {
-
-                    }
-
-
-                })
-
-
 
         emailText!!.addTextChangedListener(
                 object : TextWatcher {
@@ -169,73 +120,16 @@ class SignInEmailFragment : Fragment() {
         return true
     }
 
-    private fun esNombreValido(nombre: String): Boolean {
-        val patron = Pattern.compile("^[a-zA-Z ]+$")
-        if (!patron.matcher(nombre).matches() || nombre.length > 30) {
-            nameLayout!!.error = "Nombre inválido"
-            return false
-        } else {
-            nameLayout!!.error = null
-        }
 
-        return true
-    }
-
-    private fun esTelefonoValido(telefono: String): Boolean {
-        if (!Patterns.PHONE.matcher(telefono).matches()) {
-            phoneLayout!!.error = "Teléfono inválido"
-            return false
-        } else {
-            phoneLayout!!.error = null
-        }
-
-        return true
-    }
-
-    private fun validarDatos(tipo: Int) {
+    private fun validarDatos() {
         val pass = passwordLayout!!.editText!!.text.toString()
         val correo = emailLayout!!.editText!!.text.toString()
-        val name = nameLayout!!.editText!!.text.toString()
-        val phone = phoneLayout!!.editText!!.text.toString()
-        val a = esNombreValido(name)
-        val b = esTelefonoValido(phone)
         val e = esCorreoValido(correo)
 
-        if (a && b && e) {
-            if(tipo == 0) {
-
-                signIn(pass, correo)
-            }else{
-
-                referenceUser = database!!.reference.child("user")
-                checkUser(correo)
-
-                signUp(pass, correo)
-            }
+        if (e) {
+            signIn(pass, correo)
         }
 
-    }
-
-    private fun signUp(pass: String, correo: String) {
-
-        mAuth!!.createUserWithEmailAndPassword(correo, pass).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                //Registration OK
-
-
-                if(pass == "administrator" && correo == "administrator@gmail.com") {
-                    val fr = AdministratorActivity()
-                    val fc = activity as ChangeListener?
-                    fc!!.replaceActivity(fr)
-                }else{
-                    val fr = UserActivity()
-                    val fc = activity as ChangeListener?
-                    fc!!.replaceActivity(fr)
-                }
-            } else {
-                //Registration error
-            }
-        }
     }
 
         private fun signIn(pass: String, correo: String) {
@@ -248,7 +142,12 @@ class SignInEmailFragment : Fragment() {
                     val fc = activity as ChangeListener?
                     fc!!.replaceActivity(fr)
                 }else{
+                    val intent = Intent()
+                    intent.putExtra("correoActual", correo)
+                    intent.putExtra("admin", true)
+
                     val fr = UserActivity()
+                    fr.intent = intent
                     val fc = activity as ChangeListener?
                     fc!!.replaceActivity(fr)
                 }
@@ -260,33 +159,5 @@ class SignInEmailFragment : Fragment() {
 
 
     }
-
-    private fun checkUser(correo: String){
-        var existe = false
-        val valueEventListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if(dataSnapshot.exists()) {
-                        existe = true
-                    }
-                if(!existe) {
-                    database!!.reference.setValue("user")
-
-                    val key = referenceUser!!.push().key
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
-                    database!!.getReference("user").child(key!!).setValue(usuario)
-                }else{
-
-                    val key = referenceUser!!.push().key
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
-                    database!!.reference.child("user").child(key!!).setValue(usuario)
-                }
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        }
-        referenceUser!!.addListenerForSingleValueEvent(valueEventListener)
-    }
-
 }
 

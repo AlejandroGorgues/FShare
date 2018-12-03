@@ -88,6 +88,9 @@
     <string name="acceso">Acceder</string>
     <string name="registro">Registrase</string>
 
+    <string name="verPerfil">Ver perfil</string>
+    <string name="verFotos">Ver fotos</string>
+
     <string name="eliminarUsuario">Eliminar usuario</string>
     <string name="modificarUsuario">Modificar datos</string>
     <string name="cambiarCorreo">Cambiar correo</string>
@@ -97,7 +100,6 @@
     <string name="guardarCambios">Guardar</string>
     <string name="borrarFoto">Borrar foto</string>
     <string name="cancelar">Cancelar</string>
-
 
 
     <string name="hint_nombre">Nombre</string>

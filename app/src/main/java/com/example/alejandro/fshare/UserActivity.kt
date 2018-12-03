@@ -22,6 +22,10 @@ class UserActivity : AppCompatActivity(), ChangeListener {
         val transaction = manager!!.beginTransaction()
 
         val fragmentLista = AlbumFragment()
+        val bundle = Bundle()
+        bundle.putString("correoActual", intent.extras.getString("correoActual"))
+        bundle.putBoolean("admin", intent.extras.getBoolean("admin"))
+        fragmentLista.arguments = bundle
 
         transaction.add(R.id.userFrameLayout, fragmentLista,  "fragmentUserList")
         transaction.addToBackStack(null)

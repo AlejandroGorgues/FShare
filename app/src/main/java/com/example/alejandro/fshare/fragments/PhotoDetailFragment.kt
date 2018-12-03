@@ -46,6 +46,7 @@ class PhotoDetailFragment : Fragment() {
 
     private var comentarioLayout: TextInputLayout? = null
     private var fotoView: ImageView? = null
+    private var currentEmail: String? = null
     private var comentarioAux: String? = null
     private var url: String?= null
     private var uri: Uri? = null
@@ -62,8 +63,7 @@ class PhotoDetailFragment : Fragment() {
 
 
         setHasOptionsMenu(true)
-        val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
-        (activity as UserActivity).setSupportActionBar(toolbar)
+
 
         mAuth = FirebaseAuth.getInstance()
 
@@ -88,6 +88,7 @@ class PhotoDetailFragment : Fragment() {
                     .with(this)
                     .load(url)
                     .into(fotoView!!)
+            currentEmail = bundle.getString("correoActual")
         }
 
         changePhoto!!.setOnClickListener {
@@ -100,14 +101,14 @@ class PhotoDetailFragment : Fragment() {
         saveChanges!!.setOnClickListener {
             if(cambiarImagen) {
 
-                storageReference = storage!!.reference.child(mAuth!!.currentUser!!.email!!)
+                storageReference = storage!!.reference.child(currentEmail!!)
                 val fotoRef = storageReference!!.child(uri2!!.lastPathSegment)
                 val uploadTask = fotoRef.putFile(uri2!!)
                 uploadTask.addOnFailureListener {
                     // Handle unsuccessful uploads
                 }.addOnSuccessListener {
                     storage!!.reference.child(mAuth!!.currentUser!!.email!! + "/" + uri2!!.lastPathSegment).downloadUrl.addOnSuccessListener { itUrl ->
-                        val foto = Photo(itUrl.toString(), comentarioLayout!!.editText!!.text.toString(), mAuth!!.currentUser!!.email!! + "/" + uri2!!.lastPathSegment, mAuth!!.currentUser!!.email!!)
+                        val foto = Photo(itUrl.toString(), comentarioLayout!!.editText!!.text.toString(), currentEmail + "/" + uri2!!.lastPathSegment, currentEmail!!)
                         referenceModifyFotoDatabase = database!!.reference.child("photos")
                         checkPhoto(foto)
                         val fr = AlbumFragment()
@@ -147,6 +148,14 @@ class PhotoDetailFragment : Fragment() {
             fc!!.replaceFragment(fr)
         }
 
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            val toolbar = view.findViewById<Toolbar>(R.id.adminToolbar)
+            (activity as AdministratorActivity).setSupportActionBar(toolbar)
+        }else{
+            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
+            (activity as UserActivity).setSupportActionBar(toolbar)
+        }
+
         return view
     }
 
@@ -169,7 +178,7 @@ class PhotoDetailFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for( ds: DataSnapshot in dataSnapshot.children){
                     val foto = ds.getValue(Photo::class.java)
-                    if(foto!!.foto == url && foto.correo == mAuth!!.currentUser!!.email){
+                    if(foto!!.foto == url && foto.correo == currentEmail){
                         val key = ds.key
                         referenceDeleteFotoDatabase.child(key!!).removeValue()
 
@@ -211,7 +220,7 @@ class PhotoDetailFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for(ds: DataSnapshot in dataSnapshot.children){
                     val fotoAux = ds.getValue(Photo::class.java)!!
-                    if(fotoAux.foto == url && fotoAux.correo == mAuth!!.currentUser!!.email) {
+                    if(fotoAux.foto == url && fotoAux.correo == currentEmail) {
                         referenceFotoComentarioDatabase.child(ds.key.toString()).child("comentario").setValue(comentarioLayout!!.editText!!.text.toString())
                         val fr = AlbumFragment()
                         val fc = activity as ChangeListener?

@@ -60,6 +60,8 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
     private var query: Query? = null
     private var nameImage: Uri? = null
 
+    private var currentEmail: String? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
@@ -76,6 +78,15 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         referenceFotoListDatabase = database!!.reference.child("photos")
         // Inflate the layout for this fragment
         recyclerFotoList = view.findViewById(R.id.rvfotoList)
+
+        val bundle = this.arguments
+        if(bundle != null){
+            currentEmail = if(bundle.getBoolean("admin")) {
+                bundle.getString("correoActual")
+            }else{
+                mAuth!!.currentUser!!.email
+            }
+        }
 
 
         query = referenceFotoListDatabase
@@ -95,7 +106,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
 
             override fun onBindViewHolder(holder: UserPhotosHolder, position: Int, foto: Photo) {
 
-                holder.bindFoto(foto, mAuth!!.currentUser!!.email!!)
+                holder.bindFoto(foto, currentEmail!!)
                 holder.cardUser.setOnClickListener {
                     elementClicked(holder.adapterPosition, holder.viewAux, foto)
                 }
@@ -143,6 +154,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         bundle.putString("Comentario", foto.comentario)
         bundle.putString("Foto", foto.foto)
         bundle.putString("Uri", foto.uri)
+        bundle.putString("correoActual", currentEmail)
 
         val fr = PhotoDetailFragment()
         fr.arguments = bundle
@@ -187,7 +199,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for( ds: DataSnapshot in dataSnapshot.children){
                     val usuario = ds.getValue(User::class.java)
-                    if(usuario!!.correo == mAuth!!.currentUser!!.email!!){
+                    if(usuario!!.correo == currentEmail){
 
 
                         bundle.putString("Nombre", usuario.nombre)
@@ -238,7 +250,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         upload!!.setOnClickListener {
 
             //Referencia mediante el correo electrónico sin codificarlo
-            storageReference = storage!!.reference.child(mAuth!!.currentUser!!.email!!)
+            storageReference = storage!!.reference.child(currentEmail!!)
 
 
             val fotoRef = storageReference!!.child(nameImage!!.lastPathSegment)
@@ -246,8 +258,8 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                 uploadTask.addOnFailureListener {
                     // Handle unsuccessful uploads
                 }.addOnSuccessListener {
-                    storage!!.reference.child(mAuth!!.currentUser!!.email!! + "/" +nameImage!!.lastPathSegment).downloadUrl.addOnSuccessListener {itUrl ->
-                    val  foto = Photo(itUrl.toString() , comentarioLayout!!.editText!!.text.toString(), mAuth!!.currentUser!!.email!! + "/" +nameImage!!.lastPathSegment, mAuth!!.currentUser!!.email!!)
+                    storage!!.reference.child(currentEmail + "/" +nameImage!!.lastPathSegment).downloadUrl.addOnSuccessListener {itUrl ->
+                    val  foto = Photo(itUrl.toString() , comentarioLayout!!.editText!!.text.toString(), currentEmail + "/" +nameImage!!.lastPathSegment, currentEmail!!)
 
                     referenceFotoDatabase = database!!.reference.child("photos")
                     checkPhoto(foto)
