@@ -10,17 +10,17 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.ImageView
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.example.alejandro.fshare.*
 import com.example.alejandro.fshare.R
 import com.example.alejandro.fshare.model.Photo
+import com.example.alejandro.fshare.model.User
 import com.google.firebase.database.*
 
 
@@ -38,6 +38,7 @@ class PhotoDetailFragment : Fragment() {
     private lateinit var referenceDeleteFotoDatabase: DatabaseReference
     private lateinit var referenceModifyFotoDatabase: DatabaseReference
     private lateinit var referenceFotoComentarioDatabase: DatabaseReference
+    private lateinit var referenceUserDatabase: DatabaseReference
 
     private var changePhoto: Button? = null
     private var saveChanges: Button? = null
@@ -66,6 +67,12 @@ class PhotoDetailFragment : Fragment() {
 
 
         mAuth = FirebaseAuth.getInstance()
+        val toolbar = view.findViewById<Toolbar>(R.id.photoToolbar)
+        if(mAuth!!.currentUser!!.email!! == "administrator@gmail.com") {
+            (activity as AdministratorActivity).setSupportActionBar(toolbar)
+        }else{
+            (activity as UserActivity).setSupportActionBar(toolbar)
+        }
 
         database = FirebaseDatabase.getInstance()
         storage = FirebaseStorage.getInstance()
@@ -87,6 +94,8 @@ class PhotoDetailFragment : Fragment() {
             GlideApp
                     .with(this)
                     .load(url)
+                    .centerCrop()
+                    .apply(RequestOptions().circleCrop())
                     .into(fotoView!!)
             currentEmail = bundle.getString("correoActual")
         }
@@ -107,13 +116,11 @@ class PhotoDetailFragment : Fragment() {
                 uploadTask.addOnFailureListener {
                     // Handle unsuccessful uploads
                 }.addOnSuccessListener {
-                    storage!!.reference.child(mAuth!!.currentUser!!.email!! + "/" + uri2!!.lastPathSegment).downloadUrl.addOnSuccessListener { itUrl ->
+                    storage!!.reference.child(currentEmail + "/" + uri2!!.lastPathSegment).downloadUrl.addOnSuccessListener { itUrl ->
                         val foto = Photo(itUrl.toString(), comentarioLayout!!.editText!!.text.toString(), currentEmail + "/" + uri2!!.lastPathSegment, currentEmail!!)
                         referenceModifyFotoDatabase = database!!.reference.child("photos")
                         checkPhoto(foto)
-                        val fr = AlbumFragment()
-                        val fc = activity as ChangeListener?
-                        fc!!.replaceFragment(fr)
+                        passData()
                     }.addOnFailureListener {
                         // Handle any errors
                     }
@@ -143,20 +150,67 @@ class PhotoDetailFragment : Fragment() {
         }
 
         cancel!!.setOnClickListener {
-            val fr = AlbumFragment()
-            val fc = activity as ChangeListener?
-            fc!!.replaceFragment(fr)
-        }
-
-        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
-            val toolbar = view.findViewById<Toolbar>(R.id.adminToolbar)
-            (activity as AdministratorActivity).setSupportActionBar(toolbar)
-        }else{
-            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
-            (activity as UserActivity).setSupportActionBar(toolbar)
+            passData()
         }
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            activity!!.menuInflater.inflate(R.menu.admin_options_menu, menu)
+        }else{
+            activity!!.menuInflater.inflate(R.menu.user_options_menu, menu)
+        }
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            return when (item.itemId) {
+                R.id.action_out -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                R.id.action_back-> {
+                    val fr = UserListFragment()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
+
+                else -> super.onOptionsItemSelected(item)
+            }
+        }else{
+            return when (item.itemId) {
+                R.id.action_out-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                R.id.action_show-> {
+
+                    referenceUserDatabase = database!!.reference.child("user")
+                    accederPerfil()
+                    true
+                }
+
+                R.id.action_back-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = AlbumFragment()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -182,9 +236,7 @@ class PhotoDetailFragment : Fragment() {
                         val key = ds.key
                         referenceDeleteFotoDatabase.child(key!!).removeValue()
 
-                        val fr = AlbumFragment()
-                        val fc = activity as ChangeListener?
-                        fc!!.replaceFragment(fr)
+                       passData()
                         break
                     }
 
@@ -222,9 +274,7 @@ class PhotoDetailFragment : Fragment() {
                     val fotoAux = ds.getValue(Photo::class.java)!!
                     if(fotoAux.foto == url && fotoAux.correo == currentEmail) {
                         referenceFotoComentarioDatabase.child(ds.key.toString()).child("comentario").setValue(comentarioLayout!!.editText!!.text.toString())
-                        val fr = AlbumFragment()
-                        val fc = activity as ChangeListener?
-                        fc!!.replaceFragment(fr)
+                        passData()
                     }
                 }
 
@@ -233,5 +283,52 @@ class PhotoDetailFragment : Fragment() {
             override fun onCancelled(databaseError: DatabaseError) {}
         }
         referenceFotoComentarioDatabase.addListenerForSingleValueEvent(valueEventListener)
+    }
+
+    private fun passData(){
+        val bundle = Bundle()
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
+            bundle.putBoolean("admin", true)
+        }else{
+            bundle.putBoolean("admin", false)
+        }
+
+        bundle.putString("correoActual", currentEmail)
+        val fr = AlbumFragment()
+        fr.arguments = bundle
+        val fc = activity as ChangeListener?
+        fc!!.replaceFragment(fr)
+    }
+
+    private fun accederPerfil(){
+        val bundle = Bundle()
+
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for( ds: DataSnapshot in dataSnapshot.children){
+                    val usuario = ds.getValue(User::class.java)
+                    if(usuario!!.correo == currentEmail){
+
+
+                        bundle.putString("Nombre", usuario.nombre)
+                        bundle.putString("Password", usuario.password)
+                        bundle.putString("Telefono", usuario.telefono)
+                        bundle.putString("Correo", usuario.correo)
+
+                        val fr = UserDataFragment()
+                        fr.arguments = bundle
+                        val fc = activity as ChangeListener?
+                        fc!!.replaceFragment(fr)
+                        break
+                    }
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+
+        referenceUserDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 }

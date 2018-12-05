@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/profileToolbar"
+        android:id="@+id/photoToolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
@@ -21,8 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:id="@+id/fotoDetail"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop" />
+        android:adjustViewBounds="true"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/comentario_layout"
@@ -30,43 +29,64 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/comentario"
+            android:hint="@string/hint_comentario"
             style="@style/FirebaseUI.TextInputEditText.NameField" />
 
     </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_changePhoto"
-            style="@style/FirebaseUI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
             android:text="@string/cambiarFoto"
             android:layout_weight="1"/>
 
         <Button
             android:id="@+id/button_savePhoto"
-            style="@style/FirebaseUI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
+            android:layout_marginStart="10dp"
             android:text="@string/guardarCambios"
             android:layout_weight="1"/>
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_deletePhoto"
-            style="@style/FirebaseUI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
             android:text="@string/borrarFoto"
             android:layout_weight="1"/>
 
         <Button
             android:id="@+id/button_cancel"
-            style="@style/FirebaseUI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
+            android:layout_marginStart="10dp"
             android:text="@string/cancelar"
             android:layout_weight="1"/>
     </LinearLayout>

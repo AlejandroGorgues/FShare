@@ -6,8 +6,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.util.Log
 import com.example.alejandro.fshare.fragments.AlbumFragment
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.FirebaseAuth
 
 class UserActivity : AppCompatActivity(), ChangeListener {
 
@@ -23,24 +24,24 @@ class UserActivity : AppCompatActivity(), ChangeListener {
 
         val fragmentLista = AlbumFragment()
         val bundle = Bundle()
-        bundle.putString("correoActual", intent.extras.getString("correoActual"))
-        bundle.putBoolean("admin", intent.extras.getBoolean("admin"))
+        bundle.putString("correoActual", this.intent.extras.getString("correoActual"))
+        bundle.putBoolean("admin",  this.intent.extras.getBoolean("admin"))
         fragmentLista.arguments = bundle
 
-        transaction.add(R.id.userFrameLayout, fragmentLista,  "fragmentUserList")
-        transaction.addToBackStack(null)
+        transaction.add(R.id.userFrameLayout, fragmentLista)
         transaction.commit()
     }
+
 
     override fun replaceFragment(fragment: Fragment) {
         val fragmentManager = manager
         val fragmentTransaction = fragmentManager!!.beginTransaction()
-        fragmentTransaction.replace(R.id.userFrameLayout, fragment, fragment.toString())
-        fragmentTransaction.addToBackStack(fragment.toString())
+        fragmentTransaction.replace(R.id.userFrameLayout, fragment)
         fragmentTransaction.commit()
     }
 
     override fun replaceActivity(activity: Activity) {
+
         val intent = Intent(this, activity::class.java)
         startActivity(intent)
     }

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/layout_margin_top"
     android:orientation="vertical">
 
 
@@ -14,13 +15,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/email"
+            android:hint="@string/hint_correo"
             style="@style/FirebaseUI.TextInputEditText.EmailField"
             android:text="pruebaaux@gmail.com"/>
         <!--android:text="administrator@gmail.com"-->
@@ -39,6 +38,7 @@
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/password"
+            android:hint="@string/hint_password"
             style="@style/FirebaseUI.TextInputEditText.PasswordField"
             android:text="1234567"/>
         <!--android:text="administrator">-->
@@ -51,13 +51,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/name"
+            android:hint="@string/hint_nombre"
             style="@style/FirebaseUI.TextInputEditText.NameField"
             android:text="administrator"/>
 
@@ -69,13 +67,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/phone"
+            android:hint="@string/hint_telefono"
             style="@style/FirebaseUI.TextInputEditText.PhoneField"
             android:text="1231321"/>
 
@@ -83,13 +79,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_createUser"
-            style="@style/FirebaseUI.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
             android:text="@string/registro" />
 
     </LinearLayout>

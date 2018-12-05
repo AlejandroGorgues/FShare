@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.request.RequestOptions
 import com.example.alejandro.fshare.GlideApp
 import com.example.alejandro.fshare.R
 import com.example.alejandro.fshare.model.Photo
@@ -25,6 +26,8 @@ class UserPhotosHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             GlideApp
                     .with(itemView.context)
                     .load(f.foto)
+                    .centerCrop()
+                    .apply(RequestOptions().circleCrop())
                     .into(foto)
         }
     }

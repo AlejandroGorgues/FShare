@@ -144,7 +144,7 @@ class SignInEmailFragment : Fragment() {
                 }else{
                     val intent = Intent()
                     intent.putExtra("correoActual", correo)
-                    intent.putExtra("admin", true)
+                    intent.putExtra("admin", false)
 
                     val fr = UserActivity()
                     fr.intent = intent
@@ -156,8 +156,6 @@ class SignInEmailFragment : Fragment() {
                 //Registration error
             }
         }
-
-
     }
 }
 

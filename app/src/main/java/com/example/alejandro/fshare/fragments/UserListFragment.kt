@@ -26,7 +26,7 @@ import com.google.firebase.database.*
 class UserListFragment : Fragment(), ClickListenerUser {
 
     private var database: FirebaseDatabase? = null
-    lateinit var mDatabase: DatabaseReference
+    private lateinit var mDatabase: DatabaseReference
 
     private var mAdapter: FirebaseRecyclerAdapter<User, UserListHolder>? = null
     private var recyclerUserList: RecyclerView? = null
@@ -91,6 +91,13 @@ class UserListFragment : Fragment(), ClickListenerUser {
                 fc!!.replaceActivity(fr)
                 true
             }
+            R.id.action_back-> {
+                FirebaseAuth.getInstance().signOut()
+                val fr = LoginActivity()
+                val fc = activity as ChangeListener?
+                fc!!.replaceActivity(fr)
+                true
+            }
 
             else -> super.onOptionsItemSelected(item)
         }
@@ -125,7 +132,6 @@ class UserListFragment : Fragment(), ClickListenerUser {
 
                     val fr = AlbumFragment()
                     fr.arguments = bundle
-
                     val fc = activity as ChangeListener?
                     fc!!.replaceFragment(fr)
                     true

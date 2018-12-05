@@ -15,4 +15,7 @@
     <dimen name="fui_button_inset_right">2dp</dimen>
 
     <dimen name="fui_min_height_target">48dp</dimen>
+
+    <dimen name="login_buttons_margin_top">65dp</dimen>
+    <dimen name="layout_margin_top">150dp</dimen>
 </resources>

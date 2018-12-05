@@ -70,6 +70,7 @@ class UserDataFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_user_data, container, false)
 
         setHasOptionsMenu(true)
+        val toolbar = view.findViewById<Toolbar>(R.id.profileToolbar)
 
         database = FirebaseDatabase.getInstance()
 
@@ -130,10 +131,8 @@ class UserDataFragment : Fragment() {
             deleteUserButton!!.visibility = View.GONE
             changeEmailButton!!.visibility = View.GONE
             changePasswordButton!!.visibility = View.GONE
-            val toolbar = view.findViewById<Toolbar>(R.id.profileToolbar)
             (activity as AdministratorActivity).setSupportActionBar(toolbar)
         }else{
-            val toolbar = view.findViewById<Toolbar>(R.id.profileToolbar)
             (activity as UserActivity).setSupportActionBar(toolbar)
         }
 
@@ -230,6 +229,12 @@ class UserDataFragment : Fragment() {
                     fc!!.replaceActivity(fr)
                     true
                 }
+                R.id.action_back-> {
+                    val fr = UserListFragment()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
 
                 else -> super.onOptionsItemSelected(item)
             }
@@ -246,6 +251,14 @@ class UserDataFragment : Fragment() {
 
                     referenceUserProfile = database!!.reference.child("user")
                     accederPerfil()
+                    true
+                }
+
+                R.id.action_back-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = AlbumFragment()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
                     true
                 }
                 else -> super.onOptionsItemSelected(item)

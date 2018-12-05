@@ -6,7 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.util.Log
 import com.example.alejandro.fshare.fragments.UserListFragment
+import com.firebase.ui.auth.data.model.User
+import com.google.firebase.auth.FirebaseAuth
 
 class AdministratorActivity : AppCompatActivity(), ChangeListener {
 
@@ -22,16 +25,15 @@ class AdministratorActivity : AppCompatActivity(), ChangeListener {
 
         val fragmentLista = UserListFragment()
 
-        transaction.add(R.id.administratorFrameLayout, fragmentLista,  "fragmentUserList")
-        transaction.addToBackStack(null)
+        transaction.add(R.id.administratorFrameLayout, fragmentLista)
         transaction.commit()
     }
+
 
     override fun replaceFragment(fragment: Fragment) {
         val fragmentManager = manager
         val fragmentTransaction = fragmentManager!!.beginTransaction()
-        fragmentTransaction.replace(R.id.administratorFrameLayout, fragment, fragment.toString())
-        fragmentTransaction.addToBackStack(fragment.toString())
+        fragmentTransaction.replace(R.id.administratorFrameLayout, fragment)
         fragmentTransaction.commit()
     }
 

@@ -24,13 +24,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/emailUser"
+            android:hint="@string/hint_correo"
             style="@style/FirebaseUI.TextInputEditText.EmailField"/>
 
     </android.support.design.widget.TextInputLayout>
@@ -46,6 +44,7 @@
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/passwordUser"
+            android:hint="@string/hint_password"
             style="@style/FirebaseUI.TextInputEditText.PasswordField" />
 
     </android.support.design.widget.TextInputLayout>
@@ -56,13 +55,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/nameUser"
+            android:hint="@string/hint_nombre"
             style="@style/FirebaseUI.TextInputEditText.NameField" />
 
     </android.support.design.widget.TextInputLayout>
@@ -73,13 +70,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fui_field_padding_vert"
-        android:transitionGroup="true"
-        android:transitionName="@string/fui_email_field_name"
-        app:errorEnabled="true"
-        tools:ignore="UnusedAttribute">
+        app:errorEnabled="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/phoneUser"
+            android:hint="@string/hint_telefono"
             style="@style/FirebaseUI.TextInputEditText.PhoneField" />
 
     </android.support.design.widget.TextInputLayout>
@@ -87,31 +82,50 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_deleteUser"
-            style="@style/FirebaseUI.Button"
-            android:text="@string/eliminarUsuario"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
+            android:text="@string/eliminarUsuario"/>
 
         <Button
             android:id="@+id/button_modifiedUser"
-            style="@style/FirebaseUI.Button"
-            android:text="@string/modificarUsuario"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
 
+            android:layout_marginStart="10dp"
+            android:text="@string/modificarUsuario" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
         <Button
             android:id="@+id/button_modifiedEmail"
-            style="@style/FirebaseUI.Button"
-            android:text="@string/cambiarCorreo"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
+            android:text="@string/cambiarCorreo" />
 
         <Button
             android:id="@+id/button_modifiedPassword"
-            style="@style/FirebaseUI.Button"
-            android:text="@string/cambiarPassword"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundButtonColor"
+            android:textColor="@color/textButtonColor"
+            android:layout_marginStart="10dp"
+            android:text="@string/cambiarPassword" />
     </LinearLayout>
 
 </LinearLayout>

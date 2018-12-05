@@ -23,7 +23,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
                 android:id="@+id/fotoAux" />
 
             <TextView
@@ -32,6 +31,8 @@
                 android:textSize="20sp"
                 android:gravity="center_horizontal"
                 android:layout_below="@+id/fotoAux"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rounded_corner"
                 android:id="@+id/fotoComentario" />
 
         </RelativeLayout>

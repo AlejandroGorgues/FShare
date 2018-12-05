@@ -4,7 +4,15 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="colorAlerta">#54c372</color>
+    <color name="colorBackground">#dfdaa5</color>
+    <color name="backgroundColorRoundTextView">#9bc2cf</color>
+    <color name="backgroundButtonColor">#003366</color>
+    <color name="textButtonColor">#cccccc</color>
+
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_300">#E0E0E0</color>
     <color name="grey_500">#9E9E9E</color>
+
+
 </resources>

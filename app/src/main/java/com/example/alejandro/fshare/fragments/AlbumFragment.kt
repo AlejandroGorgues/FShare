@@ -66,11 +66,19 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
 
-        setHasOptionsMenu(true)
-        val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
-        (activity as UserActivity).setSupportActionBar(toolbar)
+
 
         mAuth = FirebaseAuth.getInstance()
+
+        setHasOptionsMenu(true)
+        if(mAuth!!.currentUser!!.email!! == "administrator@gmail.com") {
+
+            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
+            (activity as AdministratorActivity).setSupportActionBar(toolbar)
+        }else{
+            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
+            (activity as UserActivity).setSupportActionBar(toolbar)
+        }
 
         database = FirebaseDatabase.getInstance()
         storage = FirebaseStorage.getInstance()
@@ -81,8 +89,10 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
 
         val bundle = this.arguments
         if(bundle != null){
+
             currentEmail = if(bundle.getBoolean("admin")) {
                 bundle.getString("correoActual")
+
             }else{
                 mAuth!!.currentUser!!.email
             }
@@ -125,26 +135,59 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        activity!!.menuInflater.inflate(R.menu.user_options_menu, menu)
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            activity!!.menuInflater.inflate(R.menu.admin_options_menu, menu)
+        }else{
+            activity!!.menuInflater.inflate(R.menu.user_options_menu, menu)
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_out-> {
-                FirebaseAuth.getInstance().signOut()
-                val fr = LoginActivity()
-                val fc = activity as ChangeListener?
-                fc!!.replaceActivity(fr)
-                true
-            }
-            R.id.action_show-> {
 
-                referenceUserDatabase = database!!.reference.child("user")
-                accederPerfil()
-                true
+        if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
+            return when (item.itemId) {
+                R.id.action_out -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                R.id.action_back-> {
+                    val fr = UserListFragment()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceFragment(fr)
+                    true
+                }
+
+                else -> super.onOptionsItemSelected(item)
             }
-            else -> super.onOptionsItemSelected(item)
+        }else{
+            return when (item.itemId) {
+                R.id.action_out-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                R.id.action_show-> {
+
+                    referenceUserDatabase = database!!.reference.child("user")
+                    accederPerfil()
+                    true
+                }
+
+                R.id.action_back-> {
+                    FirebaseAuth.getInstance().signOut()
+                    val fr = LoginActivity()
+                    val fc = activity as ChangeListener?
+                    fc!!.replaceActivity(fr)
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
         }
     }
 
@@ -188,7 +231,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
 
     private fun inicializarReciclerView(){
         recyclerFotoList!!.adapter = mAdapter
-        recyclerFotoList!!.layoutManager =  GridLayoutManager(activity, 2)
+        recyclerFotoList!!.layoutManager = GridLayoutManager(activity, 2)
         recyclerFotoList!!.itemAnimator = DefaultItemAnimator()
     }
 

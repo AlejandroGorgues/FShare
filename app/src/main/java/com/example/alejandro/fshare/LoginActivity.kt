@@ -7,8 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.example.alejandro.fshare.fragments.LoginSelectionFragment
 import android.content.Intent
-
-
+import android.util.Log
 
 
 class LoginActivity : AppCompatActivity(), ChangeListener {
@@ -26,8 +25,7 @@ class LoginActivity : AppCompatActivity(), ChangeListener {
 
         val fragmentLista = LoginSelectionFragment()
 
-        transaction.add(R.id.loginFrameLayout, fragmentLista,  "fragmentLogin")
-        transaction.addToBackStack(null)
+        transaction.add(R.id.loginFrameLayout, fragmentLista)
         transaction.commit()
 
     }
@@ -35,13 +33,17 @@ class LoginActivity : AppCompatActivity(), ChangeListener {
     override fun replaceFragment(fragment: Fragment) {
         val fragmentManager = manager
         val fragmentTransaction = fragmentManager!!.beginTransaction()
-        fragmentTransaction.replace(R.id.loginFrameLayout, fragment, fragment.toString())
-        fragmentTransaction.addToBackStack(fragment.toString())
+        fragmentTransaction.replace(R.id.loginFrameLayout, fragment)
         fragmentTransaction.commit()
     }
 
     override fun replaceActivity(activity: Activity) {
-        val intent = Intent(this, activity::class.java)
-        startActivity(intent)
+
+        val intentAux = Intent(this, activity::class.java)
+        if(activity.intent != null) {
+            intentAux.putExtra("correoActual", activity.intent.extras.getString("correoActual"))
+            intentAux.putExtra("admin", activity.intent.extras.getBoolean("admin"))
+        }
+        startActivity(intentAux)
     }
 }

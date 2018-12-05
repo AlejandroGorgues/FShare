@@ -1,5 +1,6 @@
 package com.example.alejandro.fshare.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -209,7 +210,13 @@ class SignUpEmailFragment : Fragment() {
                     val fc = activity as ChangeListener?
                     fc!!.replaceActivity(fr)
                 }else{
+
+                    val intent = Intent()
+                    intent.putExtra("correoActual", correo)
+                    intent.putExtra("admin", false)
+
                     val fr = UserActivity()
+                    fr.intent = intent
                     val fc = activity as ChangeListener?
                     fc!!.replaceActivity(fr)
                 }
