@@ -89,16 +89,16 @@
             android:id="@+id/button_deleteUser"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/backgroundButtonColor"
             android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
             android:text="@string/eliminarUsuario"/>
 
         <Button
             android:id="@+id/button_modifiedUser"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/backgroundButtonColor"
             android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
 
             android:layout_marginStart="10dp"
             android:text="@string/modificarUsuario" />
@@ -114,16 +114,16 @@
             android:id="@+id/button_modifiedEmail"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/backgroundButtonColor"
             android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
             android:text="@string/cambiarCorreo" />
 
         <Button
             android:id="@+id/button_modifiedPassword"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/backgroundButtonColor"
             android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
             android:layout_marginStart="10dp"
             android:text="@string/cambiarPassword" />
     </LinearLayout>

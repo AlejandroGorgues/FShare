@@ -13,8 +13,8 @@
 
     <string name="eliminarUsuario">Eliminar usuario</string>
     <string name="modificarUsuario">Modificar datos</string>
-    <string name="cambiarCorreo">Cambiar correo</string>
-    <string name="cambiarPassword">Cambiar contraseña</string>
+    <string name="cambiarCorreo">Cambiar solo correo</string>
+    <string name="cambiarPassword">Cambiar solo contraseña</string>
 
     <string name="cambiarFoto">Cambiar foto</string>
     <string name="guardarCambios">Guardar</string>

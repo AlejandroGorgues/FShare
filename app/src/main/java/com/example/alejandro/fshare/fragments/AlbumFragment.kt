@@ -71,12 +71,12 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         mAuth = FirebaseAuth.getInstance()
 
         setHasOptionsMenu(true)
+        val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
         if(mAuth!!.currentUser!!.email!! == "administrator@gmail.com") {
 
-            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
+
             (activity as AdministratorActivity).setSupportActionBar(toolbar)
         }else{
-            val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
             (activity as UserActivity).setSupportActionBar(toolbar)
         }
 

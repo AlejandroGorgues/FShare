@@ -177,7 +177,8 @@ class PhotoDetailFragment : Fragment() {
                     true
                 }
                 R.id.action_back-> {
-                    val fr = UserListFragment()
+                    val fr = AlbumFragment()
+                    fr.arguments = passData(true)
                     val fc = activity as ChangeListener?
                     fc!!.replaceFragment(fr)
                     true
@@ -202,8 +203,8 @@ class PhotoDetailFragment : Fragment() {
                 }
 
                 R.id.action_back-> {
-                    FirebaseAuth.getInstance().signOut()
                     val fr = AlbumFragment()
+                    fr.arguments = passData(false)
                     val fc = activity as ChangeListener?
                     fc!!.replaceFragment(fr)
                     true
@@ -330,5 +331,12 @@ class PhotoDetailFragment : Fragment() {
         }
 
         referenceUserDatabase.addListenerForSingleValueEvent(valueEventListener)
+    }
+
+    private fun passData(admin: Boolean): Bundle{
+        val bundle = Bundle()
+        bundle.putString("correcoActual", currentEmail)
+        bundle.putBoolean("admin", admin)
+        return bundle
     }
 }

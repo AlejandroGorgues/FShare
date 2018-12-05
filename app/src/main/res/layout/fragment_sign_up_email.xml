@@ -87,8 +87,8 @@
             android:id="@+id/button_createUser"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/backgroundButtonColor"
             android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
             android:text="@string/registro" />
 
     </LinearLayout>
