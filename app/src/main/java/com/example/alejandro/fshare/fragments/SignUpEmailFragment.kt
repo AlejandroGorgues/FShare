@@ -15,6 +15,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.util.Patterns
 import android.widget.Button
+import android.widget.Toast
 import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.UserActivity
@@ -29,6 +30,7 @@ class SignUpEmailFragment : Fragment() {
     private var database: FirebaseDatabase? = null
 
     private var signUpButton: Button? = null
+    private var atrasButton: Button? = null
 
 
     private var emailLayout: TextInputLayout? = null
@@ -50,6 +52,7 @@ class SignUpEmailFragment : Fragment() {
         database = FirebaseDatabase.getInstance()
 
         signUpButton = view.findViewById(R.id.button_createUser)
+        atrasButton = view.findViewById(R.id.button_atras)
 
 
         emailLayout = view.findViewById(R.id.email_layout)
@@ -68,6 +71,12 @@ class SignUpEmailFragment : Fragment() {
 
         signUpButton!!.setOnClickListener {
             validarDatos()
+        }
+
+        atrasButton!!.setOnClickListener {
+            val fr = SignInEmailFragment()
+            val fc = activity as ChangeListener?
+            fc!!.replaceFragment(fr)
         }
 
 
@@ -142,13 +151,12 @@ class SignUpEmailFragment : Fragment() {
 
                 })
 
-        // Inflate the layout for this fragment
         return view
     }
 
     private fun esCorreoValido(correo: String): Boolean {
         if (!Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
-            emailLayout!!.error = "Correo electrónico inválido"
+            emailLayout!!.error = resources.getString(R.string.CorreoInvalido)
             return false
         } else {
             emailLayout!!.error = null
@@ -160,7 +168,7 @@ class SignUpEmailFragment : Fragment() {
     private fun esNombreValido(nombre: String): Boolean {
         val patron = Pattern.compile("^[a-zA-Z ]+$")
         if (!patron.matcher(nombre).matches() || nombre.length > 30) {
-            nameLayout!!.error = "Nombre inválido"
+            nameLayout!!.error = resources.getString(R.string.NombreInvalido)
             return false
         } else {
             nameLayout!!.error = null
@@ -171,7 +179,7 @@ class SignUpEmailFragment : Fragment() {
 
     private fun esTelefonoValido(telefono: String): Boolean {
         if (!Patterns.PHONE.matcher(telefono).matches()) {
-            phoneLayout!!.error = "Teléfono inválido"
+            phoneLayout!!.error = resources.getString(R.string.TelefonoInvalido)
             return false
         } else {
             phoneLayout!!.error = null
@@ -198,12 +206,11 @@ class SignUpEmailFragment : Fragment() {
 
     }
 
+    //Crea el usuario en Firebase
     private fun signUp(pass: String, correo: String) {
 
         mAuth!!.createUserWithEmailAndPassword(correo, pass).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                //Registration OK
-
 
                 if(pass == "administrator" && correo == "administrator@gmail.com") {
                     val fr = AdministratorActivity()
@@ -221,29 +228,30 @@ class SignUpEmailFragment : Fragment() {
                     fc!!.replaceActivity(fr)
                 }
             } else {
-                //Registration error
+                Toast.makeText(this.context,resources.getString(R.string.falloAutenticacion),Toast.LENGTH_LONG).show()
             }
         }
     }
 
+    //Comprueba si existe el usuario para no duplicarlo en la base de datos
     private fun checkUser(correo: String){
         var existe = false
+        var usuarioExiste: User?
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    existe = true
+                for(ds:DataSnapshot in dataSnapshot.children) {
+                    usuarioExiste = ds.getValue(User::class.java)
+                    if(usuarioExiste!!.correo == correo){
+                        existe = true
+                        break
+                    }
                 }
+
                 if(!existe) {
-                    database!!.reference.setValue("user")
 
                     val key = referenceUser!!.push().key
                     val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
                     database!!.getReference("user").child(key!!).setValue(usuario)
-                }else{
-
-                    val key = referenceUser!!.push().key
-                    val usuario = User(nameLayout!!.editText!!.text.toString(), phoneLayout!!.editText!!.text.toString(), correo, passwordLayout!!.editText!!.text.toString())
-                    database!!.reference.child("user").child(key!!).setValue(usuario)
                 }
 
             }

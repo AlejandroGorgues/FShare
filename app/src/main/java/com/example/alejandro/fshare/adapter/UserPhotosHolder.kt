@@ -18,22 +18,20 @@ class UserPhotosHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var cardUser: CardView = itemView.findViewById<CardView>(R.id.cardViewFoto)
     var viewAux: View = itemView
 
-    fun bindFoto(f: Photo, currentEmail: String) {
+    fun bindFoto(f: Photo) {
 
-        if(f.correo == currentEmail) {
             commentarioFoto.text = f.comentario
-
             GlideApp
                     .with(itemView.context)
                     .load(f.foto)
                     .centerCrop()
                     .apply(RequestOptions().circleCrop())
                     .into(foto)
-        }
     }
 
 }
 
+//Interfaz que es utilizada para implementar el click en el elemento
 interface ClickListenerPhoto {
     fun elementClicked(id:Int, v: View, foto: Photo)
 }

@@ -22,9 +22,7 @@ class LoginActivity : AppCompatActivity(), ChangeListener {
 
         manager = supportFragmentManager
         val transaction = manager!!.beginTransaction()
-
         val fragmentLista = LoginSelectionFragment()
-
         transaction.add(R.id.loginFrameLayout, fragmentLista)
         transaction.commit()
 

@@ -15,8 +15,6 @@ import com.example.alejandro.fshare.model.User
 
 class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-
-
     var nombreUser: TextView = itemView.findViewById(R.id.uNombre)
     var phoneUser: TextView = itemView.findViewById(R.id.uTelefono)
     var cardUser: CardView = itemView.findViewById(R.id.cardViewUser)
@@ -28,11 +26,9 @@ class UserListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         phoneUser.text = u.telefono
 
     }
-
-
-
 }
 
+//Interfaz que es utilizada para implementar el click en el elemento
 interface ClickListenerUser {
     fun elementClicked(id:Int, v: View, user: User)
 }

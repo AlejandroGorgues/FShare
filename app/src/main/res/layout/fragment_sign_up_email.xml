@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/layout_margin_top"
@@ -20,8 +19,7 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/email"
             android:hint="@string/hint_correo"
-            style="@style/FirebaseUI.TextInputEditText.EmailField"
-            android:text="pruebaaux@gmail.com"/>
+            style="@style/FirebaseUI.TextInputEditText.EmailField" />
         <!--android:text="administrator@gmail.com"-->
 
 
@@ -39,8 +37,7 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/password"
             android:hint="@string/hint_password"
-            style="@style/FirebaseUI.TextInputEditText.PasswordField"
-            android:text="1234567"/>
+            style="@style/FirebaseUI.TextInputEditText.PasswordField" />
         <!--android:text="administrator">-->
 
     </android.support.design.widget.TextInputLayout>
@@ -56,8 +53,7 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/name"
             android:hint="@string/hint_nombre"
-            style="@style/FirebaseUI.TextInputEditText.NameField"
-            android:text="administrator"/>
+            style="@style/FirebaseUI.TextInputEditText.NameField" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -72,8 +68,7 @@
         <android.support.design.widget.TextInputEditText
             android:id="@+id/phone"
             android:hint="@string/hint_telefono"
-            style="@style/FirebaseUI.TextInputEditText.PhoneField"
-            android:text="1231321"/>
+            style="@style/FirebaseUI.TextInputEditText.PhoneField" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -90,6 +85,15 @@
             android:textColor="@color/textButtonColor"
             android:background="@drawable/button_rounded_corner"
             android:text="@string/registro" />
+
+        <Button
+            android:id="@+id/button_atras"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
+            android:text="@string/atras" />
 
     </LinearLayout>
 

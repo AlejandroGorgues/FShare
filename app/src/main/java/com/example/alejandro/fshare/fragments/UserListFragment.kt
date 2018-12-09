@@ -43,17 +43,19 @@ class UserListFragment : Fragment(), ClickListenerUser {
 
         database = FirebaseDatabase.getInstance()
         mDatabase = database!!.reference
-        // Inflate the layout for this fragment
+
+
         recyclerUserList = view.findViewById(R.id.rvUserList)
 
-
+        //Selección de todos los usuarios para rellenar la lista
         query = mDatabase.child("user")
+
+        //Obtención del objeto de tipo FirebaseRecyclerOptions<User!> usado por FirebaseRecyclerAdapter
         val options = FirebaseRecyclerOptions.Builder<User>()
-                .setQuery(query as DatabaseReference, User::class.java)
+                .setQuery(query!!, User::class.java)
                 .build()
 
         mAdapter = object : FirebaseRecyclerAdapter<User, UserListHolder>(options) {
-
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListHolder {
                 val viewHolder = LayoutInflater.from(parent.context)
@@ -67,11 +69,9 @@ class UserListFragment : Fragment(), ClickListenerUser {
                 holder.cardUser.setOnClickListener {
                     elementClicked(holder.adapterPosition, holder.viewAux, user)
                 }
-
-
             }
-
         }
+
         inicializarReciclerView()
 
         return view
@@ -85,6 +85,7 @@ class UserListFragment : Fragment(), ClickListenerUser {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_out-> {
+                //Se desconecta de la aplicación
                 FirebaseAuth.getInstance().signOut()
                 val fr = LoginActivity()
                 val fc = activity as ChangeListener?
@@ -92,6 +93,7 @@ class UserListFragment : Fragment(), ClickListenerUser {
                 true
             }
             R.id.action_back-> {
+                //Vuelve a la actividad anterior
                 FirebaseAuth.getInstance().signOut()
                 val fr = LoginActivity()
                 val fc = activity as ChangeListener?
@@ -105,7 +107,7 @@ class UserListFragment : Fragment(), ClickListenerUser {
 
     override fun elementClicked(id: Int, v: View, user:User) {
 
-
+        //Carga un meú con las opciones de ver el perfil o ver las fotos
         val popupMenu = PopupMenu(activity, v)
         popupMenu.inflate(R.menu.user_management_menu)
         popupMenu.setOnMenuItemClickListener { item ->
@@ -148,7 +150,6 @@ class UserListFragment : Fragment(), ClickListenerUser {
         mAdapter?.startListening()
 
     }
-
 
     override fun onStop() {
         super.onStop()

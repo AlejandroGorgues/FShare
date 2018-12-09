@@ -22,9 +22,7 @@ class AdministratorActivity : AppCompatActivity(), ChangeListener {
 
         manager = supportFragmentManager
         val transaction = manager!!.beginTransaction()
-
         val fragmentLista = UserListFragment()
-
         transaction.add(R.id.administratorFrameLayout, fragmentLista)
         transaction.commit()
     }

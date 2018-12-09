@@ -24,6 +24,7 @@ import com.google.firebase.storage.StorageReference
 import android.content.Intent
 import android.text.Editable
 import android.util.Log
+import android.widget.Toast
 import com.example.alejandro.fshare.*
 import com.example.alejandro.fshare.R
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -58,6 +59,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
     private val OPEN_DOCUMENT_CODE = 2
 
     private var query: Query? = null
+    private var queryAux: Query? = null
     private var nameImage: Uri? = null
 
     private var currentEmail: String? = null
@@ -66,14 +68,11 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_album, container, false)
 
-
-
         mAuth = FirebaseAuth.getInstance()
 
         setHasOptionsMenu(true)
         val toolbar = view.findViewById<Toolbar>(R.id.userToolbar)
         if(mAuth!!.currentUser!!.email!! == "administrator@gmail.com") {
-
 
             (activity as AdministratorActivity).setSupportActionBar(toolbar)
         }else{
@@ -84,9 +83,10 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         storage = FirebaseStorage.getInstance()
 
         referenceFotoListDatabase = database!!.reference.child("photos")
-        // Inflate the layout for this fragment
+
         recyclerFotoList = view.findViewById(R.id.rvfotoList)
 
+        //Selección del correo correspondiente al album de fotos actual
         val bundle = this.arguments
         if(bundle != null){
 
@@ -98,10 +98,12 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             }
         }
 
+        //Selección de las fotos correspondientes al correo actual para rellenar la lista
+        query = referenceFotoListDatabase.orderByChild("correo").equalTo(currentEmail)
 
-        query = referenceFotoListDatabase
+        //Obtención del objeto de tipo FirebaseRecyclerOptions<Photo!> usado por FirebaseRecyclerAdapter
         val options = FirebaseRecyclerOptions.Builder<Photo>()
-                .setQuery(query as DatabaseReference, Photo::class.java)
+                .setQuery(query!!, Photo::class.java)
                 .build()
 
         mAdapter = object : FirebaseRecyclerAdapter<Photo, UserPhotosHolder>(options) {
@@ -115,13 +117,11 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             }
 
             override fun onBindViewHolder(holder: UserPhotosHolder, position: Int, foto: Photo) {
-
-                holder.bindFoto(foto, currentEmail!!)
-                holder.cardUser.setOnClickListener {
-                    elementClicked(holder.adapterPosition, holder.viewAux, foto)
-                }
+                    holder.bindFoto(foto)
+                    holder.cardUser.setOnClickListener {
+                        elementClicked(holder.adapterPosition, holder.viewAux, foto)
+                    }
             }
-
         }
         inicializarReciclerView()
 
@@ -129,7 +129,6 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         addPhotoFloatingB = view.findViewById(R.id.floatSubirFoto)
         addPhotoFloatingB.setOnClickListener {
             subirFotoDialog() }
-
 
         return view
     }
@@ -148,6 +147,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
             return when (item.itemId) {
                 R.id.action_out -> {
+                    //Se desconecta de la aplicación
                     FirebaseAuth.getInstance().signOut()
                     val fr = LoginActivity()
                     val fc = activity as ChangeListener?
@@ -155,6 +155,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                     true
                 }
                 R.id.action_back-> {
+                    //Vuelve al fragment anterior
                     val fr = UserListFragment()
                     val fc = activity as ChangeListener?
                     fc!!.replaceFragment(fr)
@@ -166,6 +167,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         }else{
             return when (item.itemId) {
                 R.id.action_out-> {
+                    //Se desconecta de la aplicación
                     FirebaseAuth.getInstance().signOut()
                     val fr = LoginActivity()
                     val fc = activity as ChangeListener?
@@ -173,13 +175,14 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                     true
                 }
                 R.id.action_show-> {
-
+                    //Muestra su perfil
                     referenceUserDatabase = database!!.reference.child("user")
                     accederPerfil()
                     true
                 }
 
                 R.id.action_back-> {
+                    //Vuelve al fragment anterior
                     FirebaseAuth.getInstance().signOut()
                     val fr = LoginActivity()
                     val fc = activity as ChangeListener?
@@ -191,6 +194,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         }
     }
 
+    //Procede a msotrar la foto y su comentario con la posibilidad de modificarlos
     override fun elementClicked(id: Int, v: View, foto: Photo) {
         val bundle = Bundle()
 
@@ -222,7 +226,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == OPEN_DOCUMENT_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-
+                //Actualiza los campos de la laerta
                 nameImage =  data.data
                 dirFoto!!.text = Editable.Factory.getInstance().newEditable(PathClass().getRealPathFromURI(context!!, nameImage!!))
             }
@@ -235,6 +239,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         recyclerFotoList!!.itemAnimator = DefaultItemAnimator()
     }
 
+    //Carga los datos en unbundle para luego ser usuados en el siguiente fragment
     private fun accederPerfil(){
         val bundle = Bundle()
 
@@ -243,7 +248,6 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                 for( ds: DataSnapshot in dataSnapshot.children){
                     val usuario = ds.getValue(User::class.java)
                     if(usuario!!.correo == currentEmail){
-
 
                         bundle.putString("Nombre", usuario.nombre)
                         bundle.putString("Password", usuario.password)
@@ -258,9 +262,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
                     }
 
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         }
 
@@ -268,6 +270,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
     }
 
 
+    //Muestra una alerta que permite subir la foto
     private fun subirFotoDialog(){
         val inflater = layoutInflater
         val view = inflater.inflate(R.layout.upload_photo_dialog, null)
@@ -282,6 +285,7 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
         dialogo.setCancelable(true)
         dialogo.setView(view)
         val show = dialogo.show()
+        //Muestra y almacena el directorio de la foto seleccionada
         obtenerDir!!.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -290,30 +294,32 @@ class AlbumFragment : Fragment(), ClickListenerPhoto {
             startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
+        //Procede a cargar la foto en la base de datos
         upload!!.setOnClickListener {
+            if( dirFoto!!.text.isEmpty() && comentarioLayout!!.editText!!.text.isEmpty()){
+                Toast.makeText(this.context, resources.getString(R.string.informacionCargaFoto), Toast.LENGTH_LONG).show()
+            }else {
+                storageReference = storage!!.reference.child(currentEmail!!)
 
-            //Referencia mediante el correo electrónico sin codificarlo
-            storageReference = storage!!.reference.child(currentEmail!!)
 
+                val fotoRef = storageReference!!.child(nameImage!!.lastPathSegment)
+                val uploadTask = fotoRef.putFile(nameImage!!)
+                uploadTask.addOnFailureListener {}.addOnSuccessListener {
+                    storage!!.reference.child(currentEmail + "/" + nameImage!!.lastPathSegment).downloadUrl.addOnSuccessListener { itUrl ->
+                        val foto = Photo(itUrl.toString(), comentarioLayout!!.editText!!.text.toString(), currentEmail + "/" + nameImage!!.lastPathSegment, currentEmail!!)
 
-            val fotoRef = storageReference!!.child(nameImage!!.lastPathSegment)
-            val uploadTask = fotoRef.putFile(nameImage!!)
-                uploadTask.addOnFailureListener {
-                    // Handle unsuccessful uploads
-                }.addOnSuccessListener {
-                    storage!!.reference.child(currentEmail + "/" +nameImage!!.lastPathSegment).downloadUrl.addOnSuccessListener {itUrl ->
-                    val  foto = Photo(itUrl.toString() , comentarioLayout!!.editText!!.text.toString(), currentEmail + "/" +nameImage!!.lastPathSegment, currentEmail!!)
-
-                    referenceFotoDatabase = database!!.reference.child("photos")
-                    checkPhoto(foto)
-                    show.dismiss()
-               }.addOnFailureListener {
-                   // Handle any errors
-               }
+                        referenceFotoDatabase = database!!.reference.child("photos")
+                        checkPhoto(foto)
+                        show.dismiss()
+                    }.addOnFailureListener {
+                        Toast.makeText(this.context, resources.getString(R.string.falloCargaFoto), Toast.LENGTH_LONG).show()
+                    }
                 }
+            }
         }
     }
 
+    //Comprueba si la foto existía con el fin de que no haya duplicados
     private fun checkPhoto(foto: Photo){
         var existeFoto = false
         val valueEventListener = object : ValueEventListener {

@@ -3,7 +3,6 @@
     <string name="sign_in">Sign In</string>
     <string name="create_account">Create Account</string>
     <string name="sign_out">Sign Out</string>
-    <string name="auth_failed">Authentication failed</string>
 
     <string name="acceso">Acceder</string>
     <string name="registro">Registrase</string>
@@ -32,4 +31,15 @@
     <string name="accion_cancelar">Cancelar</string>
     <string name="accion_aceptar">Aceptar</string>
     <string name="puntosVerticales">&#8942;</string>
+    <string name="atras">Atrás</string>
+
+    <string name="correoEnUso">Error: El correo electrónico ya se encuentra en uso</string>
+    <string name="NombreInvalido">Nombre inválido</string>
+    <string name="CorreoInvalido">Correo electrónico inválido</string>
+    <string name="TelefonoInvalido">Teléfono inválido</string>
+    <string name="falloCargaFoto">Fallo al cargar la foto</string>
+    <string name="informacionCargaFoto">Introduce una foto y un comentario para subir la foto</string>
+    <string name="falloAutenticacion">Fallo en la autenticación</string>
+    <string name="fallGuardarFoto">Fallo al guardar la foto</string>
+    <string name="falloRegistro">Fallo en el registro</string>
 </resources>

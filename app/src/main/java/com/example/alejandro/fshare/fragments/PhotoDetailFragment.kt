@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
@@ -68,6 +69,7 @@ class PhotoDetailFragment : Fragment() {
 
         mAuth = FirebaseAuth.getInstance()
         val toolbar = view.findViewById<Toolbar>(R.id.photoToolbar)
+        //Comprueba si el usuario actual es el administrador o no para cargar una toolbar específica
         if(mAuth!!.currentUser!!.email!! == "administrator@gmail.com") {
             (activity as AdministratorActivity).setSupportActionBar(toolbar)
         }else{
@@ -85,6 +87,7 @@ class PhotoDetailFragment : Fragment() {
         deletePhoto = view.findViewById(R.id.button_deletePhoto)
         cancel = view.findViewById(R.id.button_cancel)
 
+        //Carga los elementos con los datos pasados por medio del bundle
         val bundle = this.arguments
         if(bundle != null){
             comentarioAux = bundle.getString("Comentario")
@@ -100,6 +103,7 @@ class PhotoDetailFragment : Fragment() {
             currentEmail = bundle.getString("correoActual")
         }
 
+        //Cambia la foto actual
         changePhoto!!.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -107,6 +111,7 @@ class PhotoDetailFragment : Fragment() {
             startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
+        //Guarda todos los cambios en la base de datos
         saveChanges!!.setOnClickListener {
             if(cambiarImagen) {
 
@@ -122,7 +127,7 @@ class PhotoDetailFragment : Fragment() {
                         checkPhoto(foto)
                         passData()
                     }.addOnFailureListener {
-                        // Handle any errors
+                        Toast.makeText(this.context,resources.getString(R.string.fallGuardarFoto), Toast.LENGTH_LONG).show()
                     }
                 }
             }else{
@@ -130,12 +135,10 @@ class PhotoDetailFragment : Fragment() {
                     referenceFotoComentarioDatabase = database!!.reference.child("photos")
                     changeComment()
                 }
-
-
-
             }
         }
 
+        //Borra la foto actual
         deletePhoto!!.setOnClickListener {
 
             storageReferencePhoto = storage!!.reference.child(uri!!.toString())
@@ -144,9 +147,7 @@ class PhotoDetailFragment : Fragment() {
                 referenceDeleteFotoDatabase = database!!.reference.child("photos")
                 deletePhotoDB()
 
-            }.addOnFailureListener {
-
-            }
+            }.addOnFailureListener {}
         }
 
         cancel!!.setOnClickListener {
@@ -170,6 +171,7 @@ class PhotoDetailFragment : Fragment() {
         if(mAuth!!.currentUser!!.email == "administrator@gmail.com") {
             return when (item.itemId) {
                 R.id.action_out -> {
+                    //Se desconecta de la aplicación
                     FirebaseAuth.getInstance().signOut()
                     val fr = LoginActivity()
                     val fc = activity as ChangeListener?
@@ -177,6 +179,7 @@ class PhotoDetailFragment : Fragment() {
                     true
                 }
                 R.id.action_back-> {
+                    //Vuelve al fragment anterior
                     val fr = AlbumFragment()
                     fr.arguments = passData(true)
                     val fc = activity as ChangeListener?
@@ -189,6 +192,7 @@ class PhotoDetailFragment : Fragment() {
         }else{
             return when (item.itemId) {
                 R.id.action_out-> {
+                    //Se desconecta de la aplicación
                     FirebaseAuth.getInstance().signOut()
                     val fr = LoginActivity()
                     val fc = activity as ChangeListener?
@@ -196,13 +200,14 @@ class PhotoDetailFragment : Fragment() {
                     true
                 }
                 R.id.action_show-> {
-
+                    //Muestra su perfil
                     referenceUserDatabase = database!!.reference.child("user")
                     accederPerfil()
                     true
                 }
 
                 R.id.action_back-> {
+                    //Vuelve al fragment anterior
                     val fr = AlbumFragment()
                     fr.arguments = passData(false)
                     val fc = activity as ChangeListener?
@@ -214,6 +219,7 @@ class PhotoDetailFragment : Fragment() {
         }
     }
 
+    //Cambia la imagen mostrada en la pantalla
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == OPEN_DOCUMENT_CODE && resultCode == Activity.RESULT_OK) {
@@ -228,6 +234,7 @@ class PhotoDetailFragment : Fragment() {
         }
     }
 
+    //Borra la foto de la base de datos
     private fun deletePhotoDB(){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -240,17 +247,14 @@ class PhotoDetailFragment : Fragment() {
                        passData()
                         break
                     }
-
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         }
-
         referenceDeleteFotoDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 
+    //Comprueba si la foto ya estaba antes en la base de datos
     private fun checkPhoto(foto: Photo){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -260,14 +264,13 @@ class PhotoDetailFragment : Fragment() {
                         referenceModifyFotoDatabase.child(ds.key.toString()).setValue(foto)
                     }
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         }
         referenceModifyFotoDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 
+    //Cambia el comentario de la base de datos
     private fun changeComment(){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -278,14 +281,14 @@ class PhotoDetailFragment : Fragment() {
                         passData()
                     }
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         }
         referenceFotoComentarioDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 
+    //Guarda el correo actual y si es administrador en un bundle que guardará para ser cargado en el
+    //fragmento AlbumFragment
     private fun passData(){
         val bundle = Bundle()
         if(mAuth!!.currentUser!!.email == "administrator@gmail.com"){
@@ -301,6 +304,7 @@ class PhotoDetailFragment : Fragment() {
         fc!!.replaceFragment(fr)
     }
 
+    //Guarda los datos del perfil actual para mostrarlos en la siguiente pantalla
     private fun accederPerfil(){
         val bundle = Bundle()
 
@@ -322,17 +326,15 @@ class PhotoDetailFragment : Fragment() {
                         fc!!.replaceFragment(fr)
                         break
                     }
-
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         }
 
         referenceUserDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 
+    //Devuelve un bundle con el correo actual y si es administrador o no
     private fun passData(admin: Boolean): Bundle{
         val bundle = Bundle()
         bundle.putString("correcoActual", currentEmail)

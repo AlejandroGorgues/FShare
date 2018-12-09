@@ -10,6 +10,7 @@ import java.io.File
 class PathClass {
 
 
+    //Función que obtiene el nombre del objeto a partir de su URI
     fun getRealPathFromURI(context: Context, contentUri: Uri): String {
         val uriString = contentUri.toString()
         val myFile = File(uriString)

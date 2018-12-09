@@ -18,6 +18,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.util.Patterns
 import android.widget.Button
+import android.widget.Toast
 import com.example.alejandro.fshare.AdministratorActivity
 import com.example.alejandro.fshare.ChangeListener
 import com.example.alejandro.fshare.UserActivity
@@ -27,10 +28,12 @@ import com.google.firebase.database.*
 class SignInEmailFragment : Fragment() {
 
     private var mAuth: FirebaseAuth? = null
+
     private var database: FirebaseDatabase? = null
 
     private var signInButton: Button? = null
     private var signUpButton: Button? = null
+    private var atrasButton: Button? = null
 
 
     private var emailLayout: TextInputLayout? = null
@@ -48,6 +51,7 @@ class SignInEmailFragment : Fragment() {
 
         signInButton = view.findViewById(R.id.button_SignInUser)
         signUpButton = view.findViewById(R.id.button_createUser)
+        atrasButton = view.findViewById(R.id.button_atras)
 
 
         emailLayout = view.findViewById(R.id.email_layout)
@@ -57,8 +61,8 @@ class SignInEmailFragment : Fragment() {
         emailText = view.findViewById(R.id.email)
         passwordText = view.findViewById(R.id.password)
 
-        mAuth = FirebaseAuth.getInstance()
 
+        mAuth = FirebaseAuth.getInstance()
         signInButton!!.setOnClickListener {
 
             validarDatos()
@@ -66,6 +70,12 @@ class SignInEmailFragment : Fragment() {
 
         signUpButton!!.setOnClickListener {
             val fr = SignUpEmailFragment()
+            val fc = activity as ChangeListener?
+            fc!!.replaceFragment(fr)
+        }
+
+        atrasButton!!.setOnClickListener {
+            val fr = LoginSelectionFragment()
             val fc = activity as ChangeListener?
             fc!!.replaceFragment(fr)
         }
@@ -104,14 +114,12 @@ class SignInEmailFragment : Fragment() {
 
 
                 })
-
-        // Inflate the layout for this fragment
         return view
     }
 
     private fun esCorreoValido(correo: String): Boolean {
         if (!Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
-            emailLayout!!.error = "Correo electrónico inválido"
+            emailLayout!!.error = resources.getString(R.string.CorreoInvalido)
             return false
         } else {
             emailLayout!!.error = null
@@ -132,10 +140,10 @@ class SignInEmailFragment : Fragment() {
 
     }
 
+    //Accede a la pantalla correspondiente
         private fun signIn(pass: String, correo: String) {
         mAuth!!.signInWithEmailAndPassword(correo, pass).addOnCompleteListener { task: Task<AuthResult> ->
             if (task.isSuccessful) {
-                //Registration OK
 
                 if(pass == "administrator" && correo == "administrator@gmail.com") {
                     val fr = AdministratorActivity()
@@ -153,7 +161,7 @@ class SignInEmailFragment : Fragment() {
                 }
 
             } else {
-                //Registration error
+                Toast.makeText(this.context,resources.getString(R.string.falloRegistro), Toast.LENGTH_LONG).show()
             }
         }
     }

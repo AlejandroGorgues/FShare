@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/layout_margin_top"
@@ -20,9 +19,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/email"
                     android:hint="@string/hint_correo"
-                    style="@style/FirebaseUI.TextInputEditText.EmailField"
-                    android:text="pruebaaux@gmail.com"/>
-                    <!--android:text="administrator@gmail.com"-->
+                    style="@style/FirebaseUI.TextInputEditText.EmailField" />
 
 
             </android.support.design.widget.TextInputLayout>
@@ -39,9 +36,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password"
                     android:hint="@string/hint_password"
-                    style="@style/FirebaseUI.TextInputEditText.PasswordField"
-                    android:text="1234567"/>
-                    <!--android:text="administrator">-->
+                    style="@style/FirebaseUI.TextInputEditText.PasswordField" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -51,22 +46,31 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_createUser"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textButtonColor"
-                android:background="@drawable/button_rounded_corner"
-                android:text="@string/registro" />
+        <Button
+            android:id="@+id/button_createUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
+            android:text="@string/registro" />
 
-            <Button
-                android:id="@+id/button_SignInUser"
-                android:layout_marginStart="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textButtonColor"
-                android:background="@drawable/button_rounded_corner"
-                android:text="@string/acceso"/>
+        <Button
+            android:id="@+id/button_SignInUser"
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
+            android:text="@string/acceso"/>
+
+        <Button
+            android:id="@+id/button_atras"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/textButtonColor"
+            android:background="@drawable/button_rounded_corner"
+            android:text="@string/atras" />
     </LinearLayout>
 
 </LinearLayout>
