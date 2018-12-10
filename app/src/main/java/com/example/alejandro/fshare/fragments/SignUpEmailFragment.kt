@@ -166,7 +166,7 @@ class SignUpEmailFragment : Fragment() {
     }
 
     private fun esNombreValido(nombre: String): Boolean {
-        val patron = Pattern.compile("^[a-zA-Z ]+$")
+        val patron = Pattern.compile("^[a-zA-Z0-9 ]+$")
         if (!patron.matcher(nombre).matches() || nombre.length > 30) {
             nameLayout!!.error = resources.getString(R.string.NombreInvalido)
             return false

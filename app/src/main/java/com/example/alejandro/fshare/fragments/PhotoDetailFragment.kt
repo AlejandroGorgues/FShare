@@ -114,7 +114,7 @@ class PhotoDetailFragment : Fragment() {
         //Guarda todos los cambios en la base de datos
         saveChanges!!.setOnClickListener {
             if(cambiarImagen) {
-
+                //Si quiere cambiar la imagen
                 storageReference = storage!!.reference.child(currentEmail!!)
                 val fotoRef = storageReference!!.child(uri2!!.lastPathSegment)
                 val uploadTask = fotoRef.putFile(uri2!!)
@@ -131,6 +131,7 @@ class PhotoDetailFragment : Fragment() {
                     }
                 }
             }else{
+                //Si solo quiere cambiar el comentario
                 if(comentarioLayout!!.editText!!.text.toString() != comentarioAux){
                     referenceFotoComentarioDatabase = database!!.reference.child("photos")
                     changeComment()
@@ -229,6 +230,8 @@ class PhotoDetailFragment : Fragment() {
                 GlideApp
                         .with(this)
                         .load(data.data)
+                        .centerCrop()
+                        .apply(RequestOptions().circleCrop())
                         .into(fotoView!!)
             }
         }
@@ -254,7 +257,7 @@ class PhotoDetailFragment : Fragment() {
         referenceDeleteFotoDatabase.addListenerForSingleValueEvent(valueEventListener)
     }
 
-    //Comprueba si la foto ya estaba antes en la base de datos
+    //Comprueba si la foto ya estaba antes en el base de datos para cambiar el objeto
     private fun checkPhoto(foto: Photo){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
